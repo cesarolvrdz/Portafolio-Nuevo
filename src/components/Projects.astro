@@ -1,35 +1,75 @@
 ---
+// Definiciones de tipos
+type ProjectStatus = 'completed' | 'in-progress' | 'planned';
+
 interface Project {
+  id: number;
   title: string;
   description: string;
   tech: string[];
   link?: string;
   image: string;
-  status?: 'completed' | 'in-progress' | 'planned';
+  status: ProjectStatus;
+  created_at: string;
+  updated_at: string;
 }
 
-const projects: Project[] = [
+// Constantes y configuración
+const CMS_URL = 'https://cms.tudominio.com/api';
+const DEFAULT_IMAGE = '/favicon.svg';
+
+// Funciones helper
+function getStatusText(status: ProjectStatus): string {
+  const statusMap: Record<ProjectStatus, string> = {
+    'completed': 'Completado',
+    'in-progress': 'En Progreso',
+    'planned': 'Planificado'
+  };
+  return statusMap[status];
+}
+
+function getStatusClasses(status: ProjectStatus): string {
+  const classMap: Record<ProjectStatus, string> = {
+    'completed': 'bg-green-100 text-green-800',
+    'in-progress': 'bg-yellow-100 text-yellow-800',
+    'planned': 'bg-blue-100 text-blue-800'
+  };
+  return classMap[status];
+}
+
+// Datos temporales de proyectos
+const projectsData: Project[] = [
   {
+    id: 1,
     title: 'Portafolio Personal',
     description: 'Sitio web profesional desarrollado con Astro y Tailwind CSS, diseñado para mostrar proyectos y habilidades de forma elegante.',
     tech: ['Astro', 'Tailwind CSS', 'GitHub Actions'],
-    image: '/favicon.svg',
-    status: 'completed'
+    image: DEFAULT_IMAGE,
+    status: 'completed' as ProjectStatus,
+    created_at: '2024-01-03',
+    updated_at: '2024-01-03'
   },
   {
+    id: 2,
     title: 'CMS con Laravel',
     description: 'Sistema de gestión de contenidos personalizado para administrar proyectos y contenido del portafolio.',
     tech: ['Laravel', 'MySQL', 'PHP'],
-    status: 'planned'
+    image: DEFAULT_IMAGE,
+    status: 'planned' as ProjectStatus,
+    created_at: '2024-01-03',
+    updated_at: '2024-01-03'
   },
   {
+    id: 3,
     title: 'Colección de Renders 3D',
     description: 'Galería de renders y animaciones creadas con Mine-Imator, mostrando proyectos creativos y habilidades de diseño 3D.',
     tech: ['Mine-Imator', 'Edición 3D'],
-    image: '/favicon.svg',
-    status: 'in-progress'
+    image: DEFAULT_IMAGE,
+    status: 'in-progress' as ProjectStatus,
+    created_at: '2024-01-03',
+    updated_at: '2024-01-03'
   }
-];
+] as const;
 ---
 <section id="projects" class="py-20 bg-gray-50 relative">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -40,46 +80,49 @@ const projects: Project[] = [
     </div>
     
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      {projects.map((project) => (
+      {projectsData.map((project) => (
         <div class="group bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden">
+          <div class="relative overflow-hidden">
+            <img 
+              src={project.image} 
+              alt={`Imagen de ${project.title}`}
+              class="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-110"
+            />
+          </div>
           <div class="p-6">
             <div class="flex items-center justify-between mb-4">
               <h3 class="text-xl font-bold text-gray-900">{project.title}</h3>
-              {project.status && (
-                <span class:list={[
-                  "px-3 py-1 rounded-full text-sm font-medium",
-                  {
-                    "bg-green-100 text-green-800": project.status === "completed",
-                    "bg-yellow-100 text-yellow-800": project.status === "in-progress",
-                    "bg-blue-100 text-blue-800": project.status === "planned"
-                  }
-                ]}>
-                  {project.status === "completed" && "Completado"}
-                  {project.status === "in-progress" && "En Progreso"}
-                  {project.status === "planned" && "Planificado"}
-                </span>
-              )}
+              <span class={`px-3 py-1 rounded-full text-sm font-medium ${getStatusClasses(project.status)}`}>
+                {getStatusText(project.status)}
+              </span>
             </div>
-            
             <p class="text-gray-600 mb-4">{project.description}</p>
-            
             <div class="flex flex-wrap gap-2 mb-4">
               {project.tech.map((tech) => (
-                <span class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">{tech}</span>
+                <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-sm">
+                  {tech}
+                </span>
               ))}
             </div>
+            {project.link && (
+              <a 
+                href={project.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex items-center text-blue-600 hover:text-blue-800"
+              >
+                Ver proyecto
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                </svg>
+              </a>
+            )}
           </div>
-          
-          {project.link && (
-            <a
-              href={project.link}
-              class="block bg-gray-50 hover:bg-gray-100 transition-colors p-4 text-center text-gray-600 hover:text-gray-900 border-t border-gray-100"
-            >
-              Ver detalles →
-            </a>
-          )}
         </div>
       ))}
+    </div>
+    <div class="mt-12 text-center">
+      <p class="text-gray-600">Más proyectos próximamente...</p>
     </div>
   </div>
 </section>
