@@ -1,47 +1,83 @@
 ---
-const projects = [
+interface Project {
+  title: string;
+  description: string;
+  tech: string[];
+  link?: string;
+  image: string;
+  status?: 'completed' | 'in-progress' | 'planned';
+}
+
+const projects: Project[] = [
   {
-    title: 'Sitio Web Personal',
-    description: 'Portafolio profesional desarrollado con Astro y Tailwind CSS, optimizado para GitHub Pages.',
-    tech: ['Astro', 'Tailwind CSS', 'GitHub Pages'],
-    link: 'https://cesarolvrdz.github.io/Portafolio-Nuevo/',
-    image: '/assets/astro.svg',
+    title: 'Portafolio Personal',
+    description: 'Sitio web profesional desarrollado con Astro y Tailwind CSS, diseñado para mostrar proyectos y habilidades de forma elegante.',
+    tech: ['Astro', 'Tailwind CSS', 'GitHub Actions'],
+    image: '/favicon.svg',
+    status: 'completed'
   },
   {
-    title: 'Edición Multimedia',
-    description: 'Proyectos de edición de video y fotografía para redes sociales y clientes locales.',
-    tech: ['Premiere', 'Photoshop', 'Canva'],
-    link: '#',
-    image: '/assets/background.svg',
+    title: 'CMS con Laravel',
+    description: 'Sistema de gestión de contenidos personalizado para administrar proyectos y contenido del portafolio.',
+    tech: ['Laravel', 'MySQL', 'PHP'],
+    status: 'planned'
   },
   {
-    title: 'Renders 3D en Mine-Imator',
-    description: 'Creación de animaciones y renders 3D basados en Minecraft para contenido digital.',
-    tech: ['Mine-Imator', 'Minecraft'],
-    link: '#',
-    image: '/assets/astro.svg',
-  },
+    title: 'Colección de Renders 3D',
+    description: 'Galería de renders y animaciones creadas con Mine-Imator, mostrando proyectos creativos y habilidades de diseño 3D.',
+    tech: ['Mine-Imator', 'Edición 3D'],
+    image: '/favicon.svg',
+    status: 'in-progress'
+  }
 ];
 ---
-<section id="projects" class="py-20 bg-gray-50">
+<section id="projects" class="py-20 bg-gray-50 relative">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="text-center mb-16">
       <h2 class="text-4xl font-bold text-gray-900 mb-4">Proyectos</h2>
       <div class="w-24 h-1 bg-blue-600 mx-auto"></div>
-      <p class="text-xl text-gray-600 mt-4">Algunos ejemplos de mi trabajo y experiencia profesional.</p>
+      <p class="text-xl text-gray-600 mt-4">Desarrollo web y contenido digital</p>
     </div>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-      {projects.map(project => (
-        <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 p-6 flex flex-col">
-          <img src={project.image} alt={project.title} class="w-full h-40 object-contain mb-6" />
-          <h3 class="text-2xl font-bold text-gray-900 mb-2">{project.title}</h3>
-          <p class="text-gray-700 mb-4">{project.description}</p>
-          <div class="flex flex-wrap gap-2 mb-4">
-            {project.tech.map(tech => (
-              <span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-medium">{tech}</span>
-            ))}
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {projects.map((project) => (
+        <div class="group bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden">
+          <div class="p-6">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-xl font-bold text-gray-900">{project.title}</h3>
+              {project.status && (
+                <span class:list={[
+                  "px-3 py-1 rounded-full text-sm font-medium",
+                  {
+                    "bg-green-100 text-green-800": project.status === "completed",
+                    "bg-yellow-100 text-yellow-800": project.status === "in-progress",
+                    "bg-blue-100 text-blue-800": project.status === "planned"
+                  }
+                ]}>
+                  {project.status === "completed" && "Completado"}
+                  {project.status === "in-progress" && "En Progreso"}
+                  {project.status === "planned" && "Planificado"}
+                </span>
+              )}
+            </div>
+            
+            <p class="text-gray-600 mb-4">{project.description}</p>
+            
+            <div class="flex flex-wrap gap-2 mb-4">
+              {project.tech.map((tech) => (
+                <span class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">{tech}</span>
+              ))}
+            </div>
           </div>
-          <a href={project.link} target="_blank" rel="noopener" class="mt-auto inline-block bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors duration-300 text-center">Ver más</a>
+          
+          {project.link && (
+            <a
+              href={project.link}
+              class="block bg-gray-50 hover:bg-gray-100 transition-colors p-4 text-center text-gray-600 hover:text-gray-900 border-t border-gray-100"
+            >
+              Ver detalles →
+            </a>
+          )}
         </div>
       ))}
     </div>
