@@ -1,8 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 
-// Variables de entorno de Supabase
+// Variables de entorno de Supabase - Soporte múltiple formatos
 const supabaseUrl = import.meta.env.SUPABASE_URL || import.meta.env.PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.SUPABASE_ANON_KEY || import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
+const supabaseAnonKey = import.meta.env.SUPABASE_KEY || import.meta.env.SUPABASE_ANON_KEY || import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
 
 // Verificar si las variables de entorno están configuradas
 export const isSupabaseConfigured = !!(supabaseUrl && supabaseAnonKey);
