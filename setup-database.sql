@@ -58,7 +58,7 @@ CREATE TABLE IF NOT EXISTS site_settings (
 -- 5. Insertar datos de ejemplo en profile
 INSERT INTO profile (name, email, phone, location, bio, avatar_url, website_url, years_experience)
 VALUES (
-    'César Valdez',
+    'César Olvera Rodríguez',
     'cesolvrdz@gmail.com',
     '(833) 107-7911',
     'México',
@@ -112,8 +112,8 @@ ON CONFLICT DO NOTHING;
 
 -- 8. Insertar configuraciones del sitio
 INSERT INTO site_settings (key, value, description) VALUES
-('site_name', 'César Valdez - Desarrollador Full Stack', 'Nombre del sitio web'),
-('site_description', 'Portafolio profesional de César Valdez, desarrollador full stack especializado en tecnologías web modernas.', 'Descripción del sitio'),
+('site_name', 'César Olvera Rodríguez - Desarrollador Full Stack', 'Nombre del sitio web'),
+('site_description', 'Portafolio profesional de César Olvera Rodríguez, desarrollador full stack especializado en tecnologías web modernas.', 'Descripción del sitio'),
 ('theme_color', '#3B82F6', 'Color principal del tema'),
 ('show_hero', 'true', 'Mostrar sección hero'),
 ('show_about', 'true', 'Mostrar sección acerca de'),
@@ -123,7 +123,7 @@ INSERT INTO site_settings (key, value, description) VALUES
 ('projects_description', 'Una selección de mis trabajos recientes y proyectos destacados.', 'Descripción de la sección de proyectos'),
 ('about_title', 'Acerca de Mí', 'Título de la sección acerca de'),
 ('contact_title', 'Contacto', 'Título de la sección de contacto'),
-('seo_title', 'César Valdez - Desarrollador Full Stack | Portafolio', 'Título SEO'),
+('seo_title', 'César Olvera Rodríguez - Desarrollador Full Stack | Portafolio', 'Título SEO'),
 ('seo_description', 'Desarrollador Full Stack con 5+ años de experiencia. Especializado en React, Node.js, y tecnologías modernas.', 'Descripción SEO'),
 ('google_analytics', '', 'ID de Google Analytics')
 ON CONFLICT (key) DO NOTHING;

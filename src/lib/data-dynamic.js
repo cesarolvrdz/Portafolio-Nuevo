@@ -43,7 +43,7 @@ export {
 const fallbackData = {
   profile: {
     id: 1,
-    name: 'César Valdez',
+    name: 'César Olvera Rodríguez',
     email: 'cesolvrdz@gmail.com',
     phone: '(833) 107-7911',
     location: 'México',
@@ -99,8 +99,8 @@ const fallbackData = {
     }
   ],
   settings: {
-    site_name: 'César Valdez - Desarrollador Full Stack',
-    site_description: 'Portafolio profesional de César Valdez, desarrollador full stack especializado en tecnologías web modernas.',
+    site_name: 'César Olvera Rodríguez - Desarrollador Full Stack',
+    site_description: 'Portafolio profesional de César Olvera Rodríguez, desarrollador full stack especializado en tecnologías web modernas.',
     theme_color: '#3B82F6',
     show_hero: 'true',
     show_about: 'true',
