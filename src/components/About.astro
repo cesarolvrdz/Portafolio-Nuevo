@@ -175,28 +175,6 @@ const stats = [
 
       <!-- Stats & Additional Info -->
       <div class="space-y-8">
-        <!-- Stats Cards -->
-        <div class="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-lg border border-white/20">
-          <h3 class="text-2xl font-bold text-slate-800 mb-6 flex items-center">
-            <svg class="w-6 h-6 mr-3 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-            </svg>
-            Estadísticas
-          </h3>
-          <div class="space-y-6">
-            {stats.map((stat) => (
-              <div class="text-center">
-                <div class="text-3xl font-bold text-transparent bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text mb-2">
-                  {stat.number}{stat.suffix || ''}
-                </div>
-                <div class="text-slate-600 text-sm font-medium">
-                  {stat.label}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
         <!-- Languages -->
         {languages.length > 0 && (
           <div class="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-lg border border-white/20">
