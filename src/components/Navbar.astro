@@ -1,39 +1,179 @@
 ---
-interface Props {
-  class?: string;
+import { getProfile, getSectionSettings } from '../lib/data.js';
+
+// Obtener datos dinámicos
+let profile: any = null;
+let sectionSettings: any = {};
+
+try {
+  profile = await getProfile();
+  sectionSettings = await getSectionSettings();
+} catch (error) {
+  console.error('Error loading navbar data:', error);
 }
 
-const links = [
-  { text: "Sobre mí", href: "#about" },
-  { text: "Habilidades", href: "#skills" },
-  { text: "Proyectos", href: "#projects" },
-  { text: "Contacto", href: "#contact" }
-];
+// Configuración de secciones con fallbacks
+const showAbout = sectionSettings?.show_about !== 'false';
+const showProjects = sectionSettings?.show_projects !== 'false';
+const showContact = sectionSettings?.show_contact !== 'false';
+
+// Nombre para mostrar en el navbar
+const fullName = profile?.full_name || profile?.name || 'César Olvera';
+const displayName = fullName.split(' ')[0]; // Solo el primer nombre
 ---
 
-<nav class="fixed w-full bg-white/90 backdrop-blur-sm z-50 shadow-sm">
+<nav class="fixed w-full bg-white/90 backdrop-blur-sm shadow-sm z-50">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="flex justify-between h-16">
-      <div class="flex items-center">
-        <a href="#" class="text-xl font-bold bg-gradient-to-r from-blue-600 to-emerald-500 bg-clip-text text-transparent">
-          César Olvera
-        </a>
+    <div class="flex justify-between items-center py-4">
+      <!-- Logo/Nombre -->
+      <a href="#hero" class="text-2xl font-bold text-gray-900 hover:text-blue-600 transition-colors smooth-scroll">
+        {displayName}
+      </a>
+      
+      <!-- Menú Desktop -->
+      <div class="hidden md:flex space-x-8">
+        <a href="#hero" class="nav-link smooth-scroll">Inicio</a>
+        {showAbout && <a href="#about" class="nav-link smooth-scroll">Acerca</a>}
+        {showProjects && <a href="#projects" class="nav-link smooth-scroll">Proyectos</a>}
+        {showContact && <a href="#contact" class="nav-link smooth-scroll">Contacto</a>}
       </div>
-      <div class="hidden sm:flex items-center space-x-8">
-        {links.map(link => (
-          <a 
-            href={link.href} 
-            class="text-gray-700 hover:text-blue-600 transition-colors duration-300"
-          >
-            {link.text}
-          </a>
-        ))}
-      </div>
-      <button class="sm:hidden text-gray-700 hover:text-blue-600">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+      
+      <!-- Botón móvil -->
+      <button 
+        id="mobile-menu-button" 
+        class="md:hidden text-gray-900 hover:text-blue-600 focus:outline-none focus:text-blue-600 transition-colors"
+        aria-label="Abrir menú móvil"
+        aria-expanded="false"
+      >
+        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
         </svg>
       </button>
     </div>
   </div>
+  
+  <!-- Menú móvil -->
+  <div id="mobile-menu" class="md:hidden hidden bg-white border-t border-gray-100">
+    <div class="px-4 pt-2 pb-4 space-y-2">
+      <a href="#hero" class="block px-3 py-2 text-base font-medium text-gray-900 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-all smooth-scroll">
+        Inicio
+      </a>
+      {showAbout && (
+        <a href="#about" class="block px-3 py-2 text-base font-medium text-gray-900 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-all smooth-scroll">
+          Acerca
+        </a>
+      )}
+      {showProjects && (
+        <a href="#projects" class="block px-3 py-2 text-base font-medium text-gray-900 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-all smooth-scroll">
+          Proyectos
+        </a>
+      )}
+      {showContact && (
+        <a href="#contact" class="block px-3 py-2 text-base font-medium text-gray-900 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-all smooth-scroll">
+          Contacto
+        </a>
+      )}
+    </div>
+  </div>
 </nav>
+
+<style>
+  .nav-link {
+    @apply text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200 relative;
+  }
+  
+  .nav-link:hover::after {
+    @apply w-full;
+  }
+  
+  .nav-link::after {
+    content: '';
+    @apply absolute bottom-0 left-0 w-0 h-0.5 bg-blue-600 transition-all duration-200;
+  }
+  
+  .nav-link.active {
+    @apply text-blue-600;
+  }
+  
+  .nav-link.active::after {
+    @apply w-full;
+  }
+  
+  .smooth-scroll {
+    scroll-behavior: smooth;
+  }
+</style>
+
+<script>
+  // Funcionalidad del menú móvil
+  document.addEventListener('DOMContentLoaded', function() {
+    const mobileMenuButton = document.getElementById('mobile-menu-button');
+    const mobileMenu = document.getElementById('mobile-menu');
+    
+    if (mobileMenuButton && mobileMenu) {
+      mobileMenuButton.addEventListener('click', function() {
+        const isExpanded = mobileMenuButton.getAttribute('aria-expanded') === 'true';
+        
+        mobileMenuButton.setAttribute('aria-expanded', (!isExpanded).toString());
+        mobileMenu.classList.toggle('hidden');
+      });
+      
+      // Cerrar menú al hacer clic en enlaces
+      const mobileLinks = mobileMenu.querySelectorAll('a');
+      mobileLinks.forEach(link => {
+        link.addEventListener('click', function() {
+          mobileMenu.classList.add('hidden');
+          mobileMenuButton.setAttribute('aria-expanded', 'false');
+        });
+      });
+    }
+    
+    // Smooth scroll para todos los enlaces internos
+    document.querySelectorAll('a[href^="#"]').forEach((anchor: Element) => {
+      anchor.addEventListener('click', (e: Event) => {
+        e.preventDefault();
+        const targetId = (anchor as HTMLAnchorElement).getAttribute('href');
+        const target = document.querySelector(targetId || '');
+        if (target) {
+          const htmlElement = target as HTMLElement;
+          const offsetTop = htmlElement.offsetTop - 80; // Compensar navbar fijo
+          window.scrollTo({
+            top: offsetTop,
+            behavior: 'smooth'
+          });
+        }
+      });
+    });
+    
+    // Resaltar enlace activo según scroll
+    function updateActiveLink() {
+      const sections = document.querySelectorAll('section[id]');
+      const navLinks = document.querySelectorAll('.nav-link');
+      
+      let currentSection = '';
+      const scrollPosition = window.scrollY + 100;
+      
+      sections.forEach(section => {
+        const htmlElement = section as HTMLElement;
+        const sectionTop = htmlElement.offsetTop;
+        const sectionHeight = htmlElement.offsetHeight;
+        
+        if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
+          currentSection = htmlElement.getAttribute('id') || '';
+        }
+      });
+      
+      navLinks.forEach(link => {
+        link.classList.remove('active');
+        const href = link.getAttribute('href');
+        if (href === `#${currentSection}`) {
+          link.classList.add('active');
+        }
+      });
+    }
+    
+    // Actualizar enlace activo en scroll
+    window.addEventListener('scroll', updateActiveLink);
+    updateActiveLink(); // Ejecutar al cargar
+  });
+</script>

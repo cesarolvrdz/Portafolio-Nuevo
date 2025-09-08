@@ -1,128 +1,277 @@
 ---
-// Definiciones de tipos
-type ProjectStatus = 'completed' | 'in-progress' | 'planned';
+import { getProjects, getContentSettings, getSectionSettings } from '../lib/data.js';
 
-interface Project {
-  id: number;
-  title: string;
-  description: string;
-  tech: string[];
-  link?: string;
-  image: string;
-  status: ProjectStatus;
-  created_at: string;
-  updated_at: string;
+// Obtener datos dinámicos
+let projects: any[] = [];
+let contentSettings: any = {};
+let sectionSettings: any = {};
+
+try {
+  projects = await getProjects();
+  contentSettings = await getContentSettings();
+  sectionSettings = await getSectionSettings();
+} catch (error) {
+  console.error('Error loading projects data:', error);
+  // Fallback a datos estáticos
+  projects = [
+    {
+      id: 1,
+      title: 'Portfolio Dinámico',
+      description: 'Sistema de portfolio completamente dinámico que se adapta automáticamente a cualquier estructura de datos desde Supabase. Incluye funcionalidades avanzadas de SEO, animaciones suaves y diseño responsive.',
+      image_url: '/api/placeholder/600/400',
+      technologies: ['Astro', 'TypeScript', 'TailwindCSS', 'Supabase'],
+      demo_url: 'https://cesarolvrdz.github.io/Portafolio-Nuevo/',
+      github_url: 'https://github.com/cesarolvrdz/Portafolio-Nuevo',
+      status: 'Completado',
+      featured: true,
+      category: 'Web Development',
+      created_at: '2025-01-01'
+    },
+    {
+      id: 2,
+      title: 'Sistema de Gestión Empresarial',
+      description: 'Aplicación web full-stack para gestión empresarial con dashboard interactivo, reportes en tiempo real y sistema de autenticación robusto.',
+      image_url: '/api/placeholder/600/400',
+      technologies: ['React', 'Node.js', 'PostgreSQL', 'Express'],
+      demo_url: '#',
+      github_url: '#',
+      status: 'En Desarrollo',
+      featured: true,
+      category: 'Full Stack',
+      created_at: '2024-12-15'
+    },
+    {
+      id: 3,
+      title: 'App Móvil de Productividad',
+      description: 'Aplicación móvil multiplataforma para gestión de tareas y productividad personal con sincronización en la nube.',
+      image_url: '/api/placeholder/600/400',
+      technologies: ['React Native', 'Firebase', 'Redux'],
+      demo_url: '#',
+      github_url: '#',
+      status: 'Planificado',
+      featured: false,
+      category: 'Mobile Development',
+      created_at: '2024-11-01'
+    }
+  ];
 }
 
-// Constantes y configuración
-const CMS_URL = 'https://cms.tudominio.com/api';
-const DEFAULT_IMAGE = '/favicon.svg';
-
-// Funciones helper
-function getStatusText(status: ProjectStatus): string {
-  const statusMap: Record<ProjectStatus, string> = {
-    'completed': 'Completado',
-    'in-progress': 'En Progreso',
-    'planned': 'Planificado'
-  };
-  return statusMap[status];
-}
-
-function getStatusClasses(status: ProjectStatus): string {
-  const classMap: Record<ProjectStatus, string> = {
-    'completed': 'bg-green-100 text-green-800',
-    'in-progress': 'bg-yellow-100 text-yellow-800',
-    'planned': 'bg-blue-100 text-blue-800'
-  };
-  return classMap[status];
-}
-
-// Datos temporales de proyectos
-const projectsData: Project[] = [
-  {
-    id: 1,
-    title: 'Portafolio Personal',
-    description: 'Sitio web profesional desarrollado con Astro y Tailwind CSS, diseñado para mostrar proyectos y habilidades de forma elegante.',
-    tech: ['Astro', 'Tailwind CSS', 'GitHub Actions'],
-    image: DEFAULT_IMAGE,
-    status: 'completed' as ProjectStatus,
-    created_at: '2024-01-03',
-    updated_at: '2024-01-03'
-  },
-  {
-    id: 2,
-    title: 'CMS con Laravel',
-    description: 'Sistema de gestión de contenidos personalizado para administrar proyectos y contenido del portafolio.',
-    tech: ['Laravel', 'MySQL', 'PHP'],
-    image: DEFAULT_IMAGE,
-    status: 'planned' as ProjectStatus,
-    created_at: '2024-01-03',
-    updated_at: '2024-01-03'
-  },
-  {
-    id: 3,
-    title: 'Colección de Renders 3D',
-    description: 'Galería de renders y animaciones creadas con Mine-Imator, mostrando proyectos creativos y habilidades de diseño 3D.',
-    tech: ['Mine-Imator', 'Edición 3D'],
-    image: DEFAULT_IMAGE,
-    status: 'in-progress' as ProjectStatus,
-    created_at: '2024-01-03',
-    updated_at: '2024-01-03'
+// Ordenar proyectos: destacados primero, luego por fecha
+const sortedProjects = projects.sort((a, b) => {
+  if (a.featured !== b.featured) {
+    return b.featured ? 1 : -1;
   }
-] as const;
+  return new Date(b.created_at || b.date || '2024-01-01').getTime() - 
+         new Date(a.created_at || a.date || '2024-01-01').getTime();
+});
+
+// Configuración de títulos de sección
+const sectionTitle = contentSettings?.projects_title || 'Mis Proyectos';
+const sectionDescription = contentSettings?.projects_description || 'Explora mi trabajo y las soluciones innovadoras que he desarrollado';
+
+// Función para obtener el estado del proyecto con colores
+const getStatusInfo = (status: string) => {
+  const statusMap: { [key: string]: { text: string, color: string, bgColor: string } } = {
+    'completado': { text: 'Completado', color: 'text-green-700', bgColor: 'bg-green-100' },
+    'completed': { text: 'Completado', color: 'text-green-700', bgColor: 'bg-green-100' },
+    'en desarrollo': { text: 'En Desarrollo', color: 'text-yellow-700', bgColor: 'bg-yellow-100' },
+    'in progress': { text: 'En Desarrollo', color: 'text-yellow-700', bgColor: 'bg-yellow-100' },
+    'planificado': { text: 'Planificado', color: 'text-blue-700', bgColor: 'bg-blue-100' },
+    'planned': { text: 'Planificado', color: 'text-blue-700', bgColor: 'bg-blue-100' }
+  };
+  
+  const key = status?.toLowerCase() || 'completado';
+  return statusMap[key] || statusMap['completado'];
+};
 ---
-<section id="projects" class="py-20 bg-gray-50 relative">
+
+<!-- Projects Section con diseño mejorado -->
+<section id="projects" class="py-20 bg-gradient-to-br from-slate-50 via-white to-slate-100">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Section Header -->
     <div class="text-center mb-16">
-      <h2 class="text-4xl font-bold text-gray-900 mb-4">Proyectos</h2>
-      <div class="w-24 h-1 bg-blue-600 mx-auto"></div>
-      <p class="text-xl text-gray-600 mt-4">Desarrollo web y contenido digital</p>
-    </div>
-    
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      {projectsData.map((project) => (
-        <div class="group bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden">
-          <div class="relative overflow-hidden">
-            <img 
-              src={project.image} 
-              alt={`Imagen de ${project.title}`}
-              class="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-110"
-            />
-          </div>
-          <div class="p-6">
-            <div class="flex items-center justify-between mb-4">
-              <h3 class="text-xl font-bold text-gray-900">{project.title}</h3>
-              <span class={`px-3 py-1 rounded-full text-sm font-medium ${getStatusClasses(project.status)}`}>
-                {getStatusText(project.status)}
-              </span>
-            </div>
-            <p class="text-gray-600 mb-4">{project.description}</p>
-            <div class="flex flex-wrap gap-2 mb-4">
-              {project.tech.map((tech) => (
-                <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-sm">
-                  {tech}
-                </span>
-              ))}
-            </div>
-            {project.link && (
-              <a 
-                href={project.link}
-                target="_blank"
-                rel="noopener noreferrer"
-                class="inline-flex items-center text-blue-600 hover:text-blue-800"
-              >
-                Ver proyecto
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" viewBox="0 0 20 20" fill="currentColor">
-                  <path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
-                </svg>
-              </a>
-            )}
-          </div>
+      <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full mb-6">
+        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
+        </svg>
+      </div>
+      <h2 class="text-4xl md:text-5xl font-bold text-slate-800 mb-6">
+        {sectionTitle}
+      </h2>
+      <p class="text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed">
+        {sectionDescription}
+      </p>
+      
+      <!-- Project Stats -->
+      <div class="flex flex-wrap justify-center gap-8 mt-12">
+        <div class="text-center">
+          <div class="text-3xl font-bold text-purple-600">{projects.length}</div>
+          <div class="text-slate-600">Proyectos</div>
         </div>
-      ))}
+        <div class="text-center">
+          <div class="text-3xl font-bold text-blue-600">{projects.filter(p => p.featured || p.is_featured).length}</div>
+          <div class="text-slate-600">Destacados</div>
+        </div>
+        <div class="text-center">
+          <div class="text-3xl font-bold text-green-600">{projects.filter(p => (p.status?.toLowerCase() || '').includes('complet')).length}</div>
+          <div class="text-slate-600">Completados</div>
+        </div>
+      </div>
     </div>
-    <div class="mt-12 text-center">
-      <p class="text-gray-600">Más proyectos próximamente...</p>
+
+    <!-- Projects Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
+      {sortedProjects.map((project) => {
+        const statusInfo = getStatusInfo(project.status || '');
+        const technologies = project.technologies || project.tech_tags || project.skills || [];
+        const demoUrl = project.demo_url || project.project_url || project.live_url;
+        const githubUrl = project.github_url || project.repository_url;
+        
+        return (
+          <div class={`group relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden ${project.featured || project.is_featured ? 'ring-2 ring-purple-200 lg:col-span-2 xl:col-span-1' : ''}`}>
+            {/* Featured Badge */}
+            {(project.featured || project.is_featured) && (
+              <div class="absolute top-4 left-4 z-10">
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg">
+                  <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                  </svg>
+                  Destacado
+                </span>
+              </div>
+            )}
+
+            {/* Project Image */}
+            <div class="relative h-48 bg-gradient-to-br from-slate-100 to-slate-200 overflow-hidden">
+              {project.image_url ? (
+                <img 
+                  src={project.image_url} 
+                  alt={project.title}
+                  class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                />
+              ) : (
+                <div class="w-full h-full flex items-center justify-center">
+                  <svg class="w-16 h-16 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
+                  </svg>
+                </div>
+              )}
+              
+              {/* Status Badge */}
+              <div class="absolute top-4 right-4">
+                <span class={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${statusInfo.bgColor} ${statusInfo.color}`}>
+                  {statusInfo.text}
+                </span>
+              </div>
+            </div>
+
+            {/* Project Content */}
+            <div class="p-6">
+              {/* Category */}
+              {project.category && (
+                <div class="mb-3">
+                  <span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-slate-100 text-slate-600">
+                    {project.category}
+                  </span>
+                </div>
+              )}
+
+              {/* Title */}
+              <h3 class="text-xl font-bold text-slate-800 mb-3 group-hover:text-purple-600 transition-colors">
+                {project.title}
+              </h3>
+
+              {/* Description */}
+              <p class="text-slate-600 mb-4 line-clamp-3">
+                {project.description}
+              </p>
+
+              {/* Technologies */}
+              {technologies.length > 0 && (
+                <div class="mb-6">
+                  <div class="flex flex-wrap gap-2">
+                    {technologies.slice(0, 6).map((tech: string) => (
+                      <span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-gradient-to-r from-blue-50 to-purple-50 text-blue-700 border border-blue-200">
+                        {tech}
+                      </span>
+                    ))}
+                    {technologies.length > 6 && (
+                      <span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-slate-100 text-slate-500">
+                        +{technologies.length - 6} más
+                      </span>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Action Buttons */}
+              <div class="flex gap-3">
+                {demoUrl && demoUrl !== '#' && (
+                  <a 
+                    href={demoUrl} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    class="flex-1 inline-flex items-center justify-center px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white text-sm font-medium rounded-lg hover:from-purple-700 hover:to-blue-700 transform hover:-translate-y-0.5 transition-all duration-200 shadow-lg hover:shadow-xl"
+                  >
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                    </svg>
+                    Ver Demo
+                  </a>
+                )}
+                
+                {githubUrl && githubUrl !== '#' && (
+                  <a 
+                    href={githubUrl} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    class="inline-flex items-center justify-center px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-medium rounded-lg transition-all duration-200"
+                    title="Ver código fuente"
+                  >
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                    </svg>
+                  </a>
+                )}
+              </div>
+
+              {/* Date */}
+              {(project.created_at || project.date) && (
+                <div class="mt-4 pt-4 border-t border-slate-100">
+                  <p class="text-xs text-slate-500">
+                    Creado: {new Date(project.created_at || project.date).toLocaleDateString('es-ES', { 
+                      year: 'numeric', 
+                      month: 'long' 
+                    })}
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      })}
     </div>
+
+    <!-- Ver más proyectos -->
+    {projects.length > 6 && (
+      <div class="text-center mt-12">
+        <button class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-slate-100 to-slate-200 hover:from-slate-200 hover:to-slate-300 text-slate-700 font-medium rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+          <span class="mr-2">Ver Más Proyectos</span>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+          </svg>
+        </button>
+      </div>
+    )}
   </div>
 </section>
+
+<style>
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+</style>
+

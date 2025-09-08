@@ -1,14 +1,39 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import About from '../components/About.astro';
 import Navbar from '../components/Navbar.astro';
+import Hero from '../components/Hero.astro';
+import About from '../components/About.astro';
 import Projects from '../components/Projects.astro';
+import Contact from '../components/Contact.astro';
+import SocialLinks from '../components/SocialLinks.astro';
+import { getSectionSettings } from '../lib/data.js';
+
+// Obtener configuración de secciones para visibilidad
+let sectionSettings: any = {};
+
+try {
+  sectionSettings = await getSectionSettings();
+} catch (error) {
+  console.error('Error loading section settings:', error);
+}
+
+// Configuración de visibilidad de secciones con fallbacks
+const showHero = sectionSettings?.show_hero !== 'false';
+const showAbout = sectionSettings?.show_about !== 'false';
+const showProjects = sectionSettings?.show_projects !== 'false';
+const showContact = sectionSettings?.show_contact !== 'false';
+const showSocialLinks = sectionSettings?.show_social_links !== 'false';
 ---
 
 <Layout>
-	<Navbar />
-	<main class="scroll-smooth">
-		<About />
-		<Projects />
+	<main>
+		<!-- Navbar -->
+		<Navbar />
+		
+		<!-- Secciones principales -->
+		{showHero && <Hero />}
+		{showAbout && <About />}
+		{showProjects && <Projects />}
+		{showContact && <Contact />}
 	</main>
 </Layout>

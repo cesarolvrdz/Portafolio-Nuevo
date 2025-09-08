@@ -1,26 +1,149 @@
 ---
 import '../styles/global.css';
+import { getSeoSettings, getThemeSettings, getPublicSettings } from '../lib/data.js';
 
 interface Props {
 	title?: string;
+	description?: string;
 }
 
-const { title = 'César Olvera Rodríguez - Portfolio' } = Astro.props;
+// Obtener configuraciones dinámicas
+let seoSettings: any = {};
+let themeSettings: any = {};
+let publicSettings: any = {};
+
+try {
+	seoSettings = await getSeoSettings() || {};
+	themeSettings = await getThemeSettings() || {};
+	publicSettings = await getPublicSettings() || {};
+} catch (error) {
+	console.error('Error loading settings:', error);
+}
+
+// Props con fallbacks
+const { 
+	title = seoSettings.site_title || publicSettings.site_title || 'César Olvera Rodríguez - Portfolio',
+	description = seoSettings.site_description || 'Portfolio personal de César Olvera Rodríguez, Ingeniero en Sistemas Computacionales'
+} = Astro.props;
+
+// Colores del tema
+const themeColor = themeSettings.theme_color || '#3b82f6';
+const accentColor = themeSettings.accent_color || '#8b5cf6';
+const siteName = seoSettings.site_title || 'César Olvera Portfolio';
 ---
 
 <!doctype html>
-<html lang="es">
+<html lang={publicSettings.site_language || 'es'} class="scroll-smooth">
 	<head>
 		<meta charset="UTF-8" />
-		<meta name="description" content="Portfolio personal de César Olvera Rodríguez, Ingeniero en Sistemas Computacionales" />
-		<meta name="viewport" content="width=device-width" />
+		<meta name="description" content={description} />
+		<meta name="keywords" content={seoSettings.site_keywords || 'desarrollador, frontend, fullstack, portfolio, astro, javascript, react, node.js'} />
+		<meta name="author" content={publicSettings.site_author || 'César Olvera Rodríguez'} />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta name="theme-color" content={themeColor} />
+		<meta name="color-scheme" content="light" />
+		
+		<!-- Preconnect para optimización -->
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		
+		<!-- Open Graph / Facebook -->
+		<meta property="og:type" content="website" />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		<meta property="og:site_name" content={siteName} />
+		<meta property="og:url" content={Astro.url.href} />
+		<meta property="og:locale" content="es_ES" />
+		
+		<!-- Twitter -->
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:title" content={title} />
+		<meta name="twitter:description" content={description} />
+		<meta name="twitter:creator" content="@cesarolvrdz" />
+		
+		<!-- Favicon y iconos -->
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="apple-touch-icon" sizes="180x180" href="/favicon.svg" />
+		<link rel="canonical" href={Astro.url.href} />
+		
 		<meta name="generator" content={Astro.generator} />
 		<title>{title}</title>
+		
+		<!-- Fuentes de Google -->
+		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+		
+		<!-- Estilos dinámicos del tema -->
+		<style define:vars={{ themeColor, accentColor }}>
+			:root {
+				--theme-color: var(--themeColor);
+				--accent-color: var(--accentColor);
+				--font-family-sans: 'Inter', system-ui, -apple-system, sans-serif;
+				--font-family-mono: 'JetBrains Mono', 'Fira Code', monospace;
+			}
+			
+			* {
+				box-sizing: border-box;
+			}
+			
+			body {
+				font-family: var(--font-family-sans);
+				line-height: 1.6;
+				-webkit-font-smoothing: antialiased;
+				-moz-osx-font-smoothing: grayscale;
+			}
+			
+			/* Mejoras de performance */
+			img {
+				content-visibility: auto;
+			}
+			
+			/* Animaciones suaves */
+			* {
+				transition: color 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
+			}
+		</style>
+		
+		<!-- Google Analytics (si está configurado) -->
+		{publicSettings.google_analytics_id && (
+			<script async src={`https://www.googletagmanager.com/gtag/js?id=${publicSettings.google_analytics_id}`}></script>
+		)}
+		{publicSettings.google_analytics_id && (
+			<script is:inline>
+				window.dataLayer = window.dataLayer || [];
+				function gtag(){dataLayer.push(arguments);}
+				gtag('js', new Date());
+				gtag('config', publicSettings.google_analytics_id);
+			</script>
+		)}
 	</head>
-	<body class="min-h-screen bg-white">
+	<body class="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 text-slate-800 antialiased">
 		<slot />
+		
+		<!-- Google Tag Manager (si está configurado) -->
+		{publicSettings.google_tag_manager_id && (
+			<script is:inline>
+				(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+				new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+				j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+				'https://www.googletagmanager.com/gtag/js?id='+i+dl;f.parentNode.insertBefore(j,f);
+				})(window,document,'script','dataLayer',publicSettings.google_tag_manager_id);
+			</script>
+		)}
+		
+		<!-- Structured Data (JSON-LD) -->
+		<script type="application/ld+json">
+			{
+				"@context": "https://schema.org",
+				"@type": "Person", 
+				"name": "César Olvera Rodríguez",
+				"jobTitle": "Ingeniero en Sistemas Computacionales",
+				"description": "Portfolio personal de César Olvera Rodríguez",
+				"url": "https://cesarolvrdz.github.io/Portafolio-Nuevo/",
+				"sameAs": [
+					"https://github.com/cesarolvrdz",
+					"https://linkedin.com/in/cesarolvrdz"
+				]
+			}
+		</script>
 	</body>
 </html>
-	}
-</style>
