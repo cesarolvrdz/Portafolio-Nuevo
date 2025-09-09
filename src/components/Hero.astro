@@ -1,31 +1,32 @@
 ---
-import { getProfile, getContentSettings, getSocialLinks } from '../lib/data.js';
+import { getProfile, getSiteSettings, getSocialLinks } from '../lib/cms-data.js';
 
-// Obtener datos dinámicos
+// Obtener datos dinámicos del CMS
 let profile: any = null;
-let contentSettings: any = {};
+let siteSettings: any = {};
 let socialLinks: any[] = [];
 
 try {
   profile = await getProfile();
-  contentSettings = await getContentSettings();
+  siteSettings = await getSiteSettings();
   socialLinks = await getSocialLinks();
 } catch (error) {
   console.error('Error loading hero data:', error);
 }
 
-// Fallbacks para contenido
-const fullName = profile?.full_name || profile?.name || 'César Olvera Rodríguez';
+// Configuración desde CMS o fallbacks
+const fullName = profile?.name || 'César Olvera Rodríguez';
 const firstName = fullName.split(' ')[0];
-const heroTitle = contentSettings?.hero_title || fullName;
-const heroSubtitle = contentSettings?.hero_subtitle || profile?.title || 'Ingeniero en Sistemas Computacionales | Desarrollador Frontend | Creador Digital';
-const heroDescription = profile?.bio || profile?.description || 'Desarrollador apasionado por crear experiencias digitales excepcionales usando las tecnologías más modernas.';
+const heroTitle = siteSettings?.hero_title || fullName;
+const heroSubtitle = siteSettings?.hero_subtitle || profile?.title || 'Desarrollador Full Stack';
+const heroDescription = profile?.bio || 'Desarrollador apasionado por crear experiencias digitales excepcionales.';
 const heroLocation = profile?.location || 'México';
 const heroEmail = profile?.email;
+const heroPhone = profile?.phone;
 const avatarUrl = profile?.avatar_url;
 
-// Skills desde el perfil o configuraciones
-const skills = profile?.skills ? JSON.parse(profile.skills) : ['JavaScript', 'React', 'Node.js', 'TypeScript', 'Astro', 'TailwindCSS'];
+// Skills desde el perfil (JSONB array)
+const skills = profile?.skills || ['JavaScript', 'React', 'Node.js', 'Laravel', 'Vue.js'];
 ---
 
 <!-- Hero Section con Diseño Moderno -->
@@ -91,12 +92,12 @@ const skills = profile?.skills ? JSON.parse(profile.skills) : ['JavaScript', 'Re
           </svg>
         </a>
 
-        {(heroEmail || profile?.phone) && (
+        {(heroEmail || heroPhone) && (
           <a 
-            href={profile?.phone ? `tel:${profile.phone}` : `mailto:${heroEmail}`}
+            href={heroPhone ? `tel:${heroPhone}` : `mailto:${heroEmail}`}
             class="group inline-flex items-center px-8 py-4 bg-white/10 backdrop-blur-sm border border-white/20 text-white font-semibold rounded-xl hover:bg-white/20 transform hover:-translate-y-1 transition-all duration-300"
           >
-            {profile?.phone ? (
+            {heroPhone ? (
               <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"></path>
               </svg>
@@ -106,7 +107,7 @@ const skills = profile?.skills ? JSON.parse(profile.skills) : ['JavaScript', 'Re
                 <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"></path>
               </svg>
             )}
-            {profile?.phone ? 'Llamar' : 'Contactar'}
+            {heroPhone ? 'Llamar' : 'Contactar'}
           </a>
         )}
       </div>

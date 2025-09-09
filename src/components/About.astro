@@ -1,32 +1,29 @@
 ---
-import { getProfile, getContentSettings, getSectionSettings, getSocialLinks } from '../lib/data.js';
+import { getProfile, getSiteSettings, getSocialLinks } from '../lib/cms-data.js';
 
-// Obtener datos dinámicos
+// Obtener datos dinámicos del CMS
 let profile: any = null;
-let contentSettings: any = {};
-let sectionSettings: any = {};
+let siteSettings: any = {};
 let socialLinks: any[] = [];
 
 try {
   profile = await getProfile();
-  contentSettings = await getContentSettings();
-  sectionSettings = await getSectionSettings();
+  siteSettings = await getSiteSettings();
   socialLinks = await getSocialLinks();
 } catch (error) {
   console.error('Error loading about data:', error);
 }
 
 // Verificar si la sección debe mostrarse
-const showAbout = sectionSettings?.show_about !== 'false';
+const showAbout = siteSettings?.show_about !== false;
 if (!showAbout) return null;
 
 // Fallbacks para contenido
-const aboutTitle = contentSettings?.about_title || 'Sobre Mí';
-const aboutDescription = contentSettings?.about_description || profile?.bio || 'Información sobre mi experiencia profesional';
-const skills = profile?.skills ? JSON.parse(profile.skills) : ['JavaScript', 'React', 'Node.js', 'Python', 'TypeScript', 'Tailwind CSS'];
-const featuredTechnologies = contentSettings?.featured_technologies ? 
-  JSON.parse(contentSettings.featured_technologies) : skills.slice(0, 8);
-const education = profile?.education ? JSON.parse(profile.education) : [
+const aboutTitle = siteSettings?.about_title || 'Sobre Mí';
+const aboutDescription = siteSettings?.about_description || profile?.bio || 'Información sobre mi experiencia profesional';
+const skills = profile?.skills || ['JavaScript', 'React', 'Node.js', 'Python', 'TypeScript', 'Tailwind CSS'];
+const featuredTechnologies = siteSettings?.featured_technologies || skills.slice(0, 8);
+const education = profile?.education || [
   { degree: 'Ing. Sistemas Computacionales', institution: 'UAT', year: '2024' },
   { degree: 'Téc. Contabilidad', institution: 'CBTis 105', year: '2020' }
 ];

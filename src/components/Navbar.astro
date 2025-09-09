@@ -1,24 +1,24 @@
 ---
-import { getProfile, getSectionSettings } from '../lib/data.js';
+import { getProfile, getSiteSettings } from '../lib/cms-data.js';
 
-// Obtener datos dinámicos
+// Obtener datos dinámicos del CMS
 let profile: any = null;
-let sectionSettings: any = {};
+let siteSettings: any = {};
 
 try {
   profile = await getProfile();
-  sectionSettings = await getSectionSettings();
+  siteSettings = await getSiteSettings();
 } catch (error) {
   console.error('Error loading navbar data:', error);
 }
 
 // Configuración de secciones con fallbacks
-const showAbout = sectionSettings?.show_about !== 'false';
-const showProjects = sectionSettings?.show_projects !== 'false';
-const showContact = sectionSettings?.show_contact !== 'false';
+const showAbout = siteSettings?.show_about !== false;
+const showProjects = siteSettings?.show_projects !== false;
+const showContact = siteSettings?.show_contact !== false;
 
 // Nombre para mostrar en el navbar
-const fullName = profile?.full_name || profile?.name || 'César Olvera';
+const fullName = profile?.name || 'César Olvera';
 const displayName = fullName.split(' ')[0]; // Solo el primer nombre
 ---
 

@@ -1,31 +1,29 @@
 ---
-import { getProfile, getContactSettings, getSectionSettings, getSocialLinks } from '../lib/data.js';
+import { getProfile, getSiteSettings, getSocialLinks } from '../lib/cms-data.js';
 
-// Obtener datos dinámicos
+// Obtener datos dinámicos del CMS
 let profile: any = null;
-let contactSettings: any = {};
-let sectionSettings: any = {};
+let siteSettings: any = {};
 let socialLinks: any[] = [];
 
 try {
   profile = await getProfile();
-  contactSettings = await getContactSettings();
-  sectionSettings = await getSectionSettings();
+  siteSettings = await getSiteSettings();
   socialLinks = await getSocialLinks();
 } catch (error) {
   console.error('Error loading contact data:', error);
 }
 
 // Verificar si la sección debe mostrarse
-const showContact = sectionSettings?.show_contact !== 'false';
+const showContact = siteSettings?.show_contact !== false;
 if (!showContact) return null;
 
 // Configuración de contacto con fallbacks
-const contactEmail = contactSettings?.contact_email || profile?.email || 'cesolvrdz@gmail.com';
-const contactPhone = contactSettings?.contact_phone || profile?.phone || '(833) 107-7911';
-const contactLocation = contactSettings?.contact_location || profile?.location || 'México';
+const contactEmail = siteSettings?.contact_email || profile?.email || 'cesolvrdz@gmail.com';
+const contactPhone = siteSettings?.contact_phone || profile?.phone || '(833) 107-7911';
+const contactLocation = siteSettings?.contact_location || profile?.location || 'México';
 const availability = profile?.available_for_work;
-const responseTime = contactSettings?.response_time || '24-48 horas';
+const responseTime = siteSettings?.response_time || '24-48 horas';
 
 // Servicios disponibles
 const services = [

@@ -1,217 +1,177 @@
-// Sistema dinámico de datos que lee automáticamente desde Supabase
+// Archivo de compatibilidad - redirecciona a las funciones del CMS
 import { 
-  getTableData, 
-  getRecord, 
-  getAllData, 
-  searchContent,
-  getProfile as getDynamicProfile,
-  getSocialLinks as getDynamicSocialLinks,
-  getProjects as getDynamicProjects,
-  getSiteSettings as getDynamicSiteSettings,
-  getContentSettings,
-  getSectionSettings,
-  getSeoSettings,
-  getThemeSettings,
-  clearCache
-} from './dynamic-data.js';
+  getProfile as getCMSProfile,
+  getProjects as getCMSProjects,
+  getSocialLinks as getCMSSocialLinks,
+  getSiteSettings as getCMSSiteSettings
+} from './cms-data.js';
 
-// Re-exportar funciones dinámicas
-export { 
-  getTableData, 
-  getRecord, 
-  getAllData, 
-  searchContent,
-  getContentSettings,
-  getSectionSettings,
-  getSeoSettings,
-  getThemeSettings,
-  clearCache
-};
+// Re-exportar funciones del CMS con nombres originales para compatibilidad
+export const getProfile = getCMSProfile;
+export const getProjects = getCMSProjects;
+export const getSocialLinks = getCMSSocialLinks;
 
-// Datos de fallback
-const fallbackData = {
-  profile: {
-    id: 1,
-    name: 'César Olvera Rodríguez',
-    email: 'cesolvrdz@gmail.com',
-    phone: '(833) 107-7911',
-    location: 'México',
-    bio: 'Desarrollador Full Stack apasionado por crear soluciones web innovadoras.',
-    avatar_url: '/api/placeholder/400/400',
-    website_url: 'https://cesolvrdz.dev',
-    resume_url: '/cv.pdf',
-    available_for_work: true,
-    years_experience: 5
-  },
-  socialLinks: [
-    {
-      id: 1,
-      platform: 'github',
-      url: 'https://github.com/cesolvrdz',
-      username: 'cesolvrdz',
-      is_active: true,
-      sort_order: 1
-    },
-    {
-      id: 2,
-      platform: 'linkedin',
-      url: 'https://linkedin.com/in/cesolvrdz',
-      username: 'cesolvrdz',
-      is_active: true,
-      sort_order: 2
-    }
-  ],
-  projects: [
-    {
-      id: 1,
-      title: 'E-commerce Platform',
-      description: 'Plataforma de comercio electrónico con React y Node.js',
-      image_url: '/api/placeholder/600/400',
-      tech_tags: ['React', 'Node.js', 'MongoDB'],
-      project_url: 'https://github.com/cesolvrdz',
-      github_url: 'https://github.com/cesolvrdz',
-      status: 'completed',
-      is_featured: true
-    }
-  ],
-  settings: {
-    site_name: 'César Olvera Rodríguez - Desarrollador Full Stack',
-    site_description: 'Portafolio profesional',
-    show_hero: 'true',
-    show_about: 'true',
-    show_projects: 'true',
-    show_contact: 'true',
-    seo_title: 'César Olvera Rodríguez - Desarrollador Full Stack',
-    seo_description: 'Portafolio profesional de César Olvera Rodríguez',
-    theme_color: '#3B82F6',
-    google_analytics: '',
-    favicon_url: '/favicon.svg'
-  }
-};
-
-export async function getProfile() {
+// Función auxiliar para configuraciones de sección usando site_settings
+export async function getSectionSettings() {
   try {
-    const dynamicProfile = await getDynamicProfile();
-    if (dynamicProfile) {
-      console.log('✅ Perfil desde Supabase');
-      return dynamicProfile;
-    }
+    const settings = await getCMSSiteSettings();
+    return {
+      show_about: settings?.show_about !== false,
+      show_projects: settings?.show_projects !== false,
+      show_contact: settings?.show_contact !== false,
+    };
   } catch (error) {
-    console.log('⚠️ Error perfil dinámico:', error.message);
+    console.error('Error loading section settings:', error);
+    return {
+      show_about: true,
+      show_projects: true,
+      show_contact: true,
+    };
   }
-  
-  console.log('🔄 Usando datos fallback - perfil');
-  return fallbackData.profile;
 }
 
-export async function getSocialLinks() {
+// Función auxiliar para configuraciones de contenido usando site_settings
+export async function getContentSettings() {
   try {
-    const dynamicSocialLinks = await getDynamicSocialLinks();
-    if (dynamicSocialLinks && dynamicSocialLinks.length > 0) {
-      console.log('✅ Enlaces sociales desde Supabase');
-      return dynamicSocialLinks;
-    }
+    const settings = await getCMSSiteSettings();
+    return {
+      projects_title: settings?.projects_title || 'Mis Proyectos',
+      projects_description: settings?.projects_description || 'Explora mi trabajo y las soluciones innovadoras que he desarrollado',
+      about_title: settings?.about_title || 'Sobre Mí',
+      about_description: settings?.about_description || 'Información sobre mi experiencia profesional',
+      featured_technologies: settings?.featured_technologies || null,
+    };
   } catch (error) {
-    console.log('⚠️ Error enlaces sociales dinámicos:', error.message);
+    console.error('Error loading content settings:', error);
+    return {
+      projects_title: 'Mis Proyectos',
+      projects_description: 'Explora mi trabajo y las soluciones innovadoras que he desarrollado',
+      about_title: 'Sobre Mí',
+      about_description: 'Información sobre mi experiencia profesional',
+      featured_technologies: null,
+    };
   }
-  
-  console.log('🔄 Usando datos fallback - enlaces sociales');
-  return fallbackData.socialLinks;
 }
 
-export async function getProjects(featured = false, limit = null) {
+// Función auxiliar para configuraciones de contacto usando site_settings
+export async function getContactSettings() {
   try {
-    const dynamicProjects = await getDynamicProjects(featured, limit);
-    if (dynamicProjects && dynamicProjects.length > 0) {
-      console.log('✅ Proyectos desde Supabase');
-      return dynamicProjects;
-    }
+    const settings = await getCMSSiteSettings();
+    return {
+      contact_email: settings?.contact_email,
+      contact_phone: settings?.contact_phone,
+      contact_location: settings?.contact_location,
+      response_time: settings?.response_time || '24-48 horas',
+    };
   } catch (error) {
-    console.log('⚠️ Error proyectos dinámicos:', error.message);
+    console.error('Error loading contact settings:', error);
+    return {
+      contact_email: null,
+      contact_phone: null,
+      contact_location: null,
+      response_time: '24-48 horas',
+    };
   }
-  
-  console.log('🔄 Usando datos fallback - proyectos');
-  let projects = [...fallbackData.projects];
-  
-  if (featured) {
-    projects = projects.filter(project => project.is_featured);
-  }
-  
-  if (limit) {
-    projects = projects.slice(0, limit);
-  }
-  
-  return projects;
 }
 
-export async function getSiteSettings() {
+// Función para obtener configuraciones del sitio (alias para compatibilidad)
+export const getSiteSettings = getCMSSiteSettings;
+
+// Funciones adicionales para Layout.astro
+export async function getSeoSettings() {
   try {
-    const dynamicSettings = await getDynamicSiteSettings();
-    if (dynamicSettings && Object.keys(dynamicSettings).length > 0) {
-      console.log('✅ Configuraciones desde Supabase');
-      return dynamicSettings;
-    }
+    const settings = await getCMSSiteSettings();
+    const profile = await getCMSProfile();
+    return {
+      site_title: settings?.site_title || settings?.site_name || profile?.name,
+      site_description: settings?.site_description || profile?.bio,
+      site_keywords: settings?.site_keywords || profile?.skills?.join(', '),
+      site_author: settings?.site_author || profile?.name,
+      site_url: settings?.site_url || 'https://portafolio-nuevo-seven-gamma.vercel.app',
+      og_image: settings?.og_image || profile?.avatar_url,
+    };
   } catch (error) {
-    console.log('⚠️ Error configuraciones dinámicas:', error.message);
+    console.error('Error loading SEO settings:', error);
+    return {
+      site_title: 'Portfolio',
+      site_description: 'Portafolio profesional',
+      site_keywords: 'desarrollador, web, programador',
+      site_author: 'Desarrollador',
+      site_url: 'https://portafolio-nuevo-seven-gamma.vercel.app',
+      og_image: null,
+    };
   }
-  
-  console.log('🔄 Usando datos fallback - configuraciones');
-  return fallbackData.settings;
 }
 
-export async function getSetting(key, defaultValue = null) {
-  const settings = await getSiteSettings();
-  return settings[key] || defaultValue;
-}
-
-export async function isSectionEnabled(sectionName) {
-  const setting = await getSetting(`show_${sectionName}`, 'true');
-  return setting === 'true' || setting === true;
+export async function getThemeSettings() {
+  try {
+    const settings = await getCMSSiteSettings();
+    return {
+      primary_color: settings?.primary_color || '#3B82F6',
+      secondary_color: settings?.secondary_color || '#8B5CF6',
+      dark_mode_enabled: settings?.dark_mode_enabled !== false,
+      theme_style: settings?.theme_style || 'modern',
+    };
+  } catch (error) {
+    console.error('Error loading theme settings:', error);
+    return {
+      primary_color: '#3B82F6',
+      secondary_color: '#8B5CF6',
+      dark_mode_enabled: true,
+      theme_style: 'modern',
+    };
+  }
 }
 
 export async function getPublicSettings() {
-  const settings = await getSiteSettings();
-  return {
-    site_name: settings.site_name,
-    site_description: settings.site_description,
-    theme_color: settings.theme_color,
-    seo_title: settings.seo_title,
-    seo_description: settings.seo_description,
-    google_analytics: settings.google_analytics,
-    favicon_url: settings.favicon_url
-  };
+  try {
+    const settings = await getCMSSiteSettings();
+    return {
+      analytics_enabled: settings?.analytics_enabled !== false,
+      google_analytics_id: settings?.google_analytics_id,
+      contact_form_enabled: settings?.contact_form_enabled !== false,
+      social_sharing_enabled: settings?.social_sharing_enabled !== false,
+    };
+  } catch (error) {
+    console.error('Error loading public settings:', error);
+    return {
+      analytics_enabled: false,
+      google_analytics_id: null,
+      contact_form_enabled: true,
+      social_sharing_enabled: true,
+    };
+  }
 }
 
-export async function getContactSettings() {
-  const profile = await getProfile();
-  const settings = await getSiteSettings();
-  return {
-    email: settings.contact_email || profile.email,
-    phone: settings.contact_phone || profile.phone,
-    location: settings.contact_location || profile.location,
-    title: settings.contact_title || 'Contacto',
-    show_email: settings.show_email !== 'false',
-    show_phone: settings.show_phone !== 'false',
-    show_location: settings.show_location !== 'false'
-  };
-}
+// Función auxiliar para obtener todos los datos de una vez
+export async function getAllData() {
+  try {
+    const [profile, projects, socialLinks, siteSettings] = await Promise.all([
+      getProfile(),
+      getProjects(),
+      getSocialLinks(),
+      getSiteSettings(),
+    ]);
 
-export default {
-  getTableData,
-  getRecord,
-  getAllData,
-  searchContent,
-  getProfile,
-  getSocialLinks,
-  getProjects,
-  getSiteSettings,
-  getSetting,
-  isSectionEnabled,
-  getPublicSettings,
-  getContactSettings,
-  getContentSettings,
-  getSectionSettings,
-  getSeoSettings,
-  getThemeSettings,
-  clearCache
-};
+    return {
+      profile,
+      projects,
+      socialLinks,
+      siteSettings,
+      contentSettings: await getContentSettings(),
+      sectionSettings: await getSectionSettings(),
+      contactSettings: await getContactSettings(),
+    };
+  } catch (error) {
+    console.error('Error loading all data:', error);
+    return {
+      profile: null,
+      projects: [],
+      socialLinks: [],
+      siteSettings: {},
+      contentSettings: {},
+      sectionSettings: { show_about: true, show_projects: true, show_contact: true },
+      contactSettings: {},
+    };
+  }
+}

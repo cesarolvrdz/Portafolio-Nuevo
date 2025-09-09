@@ -1,15 +1,13 @@
 ---
-import { getProjects, getContentSettings, getSectionSettings } from '../lib/data.js';
+import { getProjects, getSiteSettings } from '../lib/cms-data.js';
 
-// Obtener datos dinámicos
+// Obtener datos dinámicos del CMS
 let projects: any[] = [];
-let contentSettings: any = {};
-let sectionSettings: any = {};
+let siteSettings: any = {};
 
 try {
   projects = await getProjects();
-  contentSettings = await getContentSettings();
-  sectionSettings = await getSectionSettings();
+  siteSettings = await getSiteSettings();
 } catch (error) {
   console.error('Error loading projects data:', error);
   // Fallback a datos estáticos
@@ -66,8 +64,8 @@ const sortedProjects = projects.sort((a, b) => {
 });
 
 // Configuración de títulos de sección
-const sectionTitle = contentSettings?.projects_title || 'Mis Proyectos';
-const sectionDescription = contentSettings?.projects_description || 'Explora mi trabajo y las soluciones innovadoras que he desarrollado';
+const sectionTitle = siteSettings?.projects_title || 'Mis Proyectos';
+const sectionDescription = siteSettings?.projects_description || 'Explora mi trabajo y las soluciones innovadoras que he desarrollado';
 
 // Función para obtener el estado del proyecto con colores
 const getStatusInfo = (status: string) => {
