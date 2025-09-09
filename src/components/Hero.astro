@@ -44,6 +44,25 @@ const skills = profile?.skills || ['JavaScript', 'React', 'Node.js', 'Laravel', 
 
   <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
     <div class="text-center">
+      <!-- Avatar del Perfil -->
+      {avatarUrl && (
+        <div class="flex justify-center mb-8">
+          <div class="relative w-32 h-32 md:w-40 md:h-40">
+            <!-- Anillo animado de gradiente -->
+            <div class="absolute inset-0 rounded-full bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 animate-spin-slow"></div>
+            <!-- Avatar -->
+            <div class="absolute inset-1 rounded-full overflow-hidden bg-white shadow-2xl">
+              <img 
+                src={avatarUrl} 
+                alt={`Avatar de ${fullName}`}
+                class="w-full h-full object-cover transform hover:scale-110 transition-transform duration-500"
+                loading="eager"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
       <!-- Title con animación de escritura -->
       <h1 class="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
         <span class="bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">

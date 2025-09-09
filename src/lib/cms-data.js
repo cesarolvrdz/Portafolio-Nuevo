@@ -83,19 +83,7 @@ export async function getProjects() {
     
     const { data, error } = await supabase
       .from('projects')
-      .select(`
-        id,
-        title,
-        description,
-        github_url,
-        demo_url,
-        image_url,
-        status,
-        featured,
-        created_at,
-        updated_at
-      `)
-      .order('featured', { ascending: false })
+      .select('*')
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -106,12 +94,30 @@ export async function getProjects() {
     if (data && data.length > 0) {
       console.log(`✅ ${data.length} proyectos desde CMS`);
       
-      // Procesar technologies si vienen como JSONB
+      // Mapear y procesar los datos del proyecto
       return data.map(project => ({
         ...project,
-        technologies: typeof project.technologies === 'string' 
-          ? JSON.parse(project.technologies) 
-          : project.technologies || []
+        // Mapear posibles nombres de columnas diferentes
+        demo_url: project.demo_url || project.live_url || project.url || project.project_url,
+        github_url: project.github_url || project.repository_url || project.repo_url,
+        technologies: (() => {
+          // Procesar technologies desde diferentes posibles columnas y formatos
+          let techs = project.technologies || project.tech_stack || project.skills || project.tech_tags;
+          
+          if (typeof techs === 'string') {
+            try {
+              techs = JSON.parse(techs);
+            } catch (e) {
+              // Si no es JSON válido, intentar separar por comas
+              techs = techs.split(',').map(t => t.trim());
+            }
+          }
+          
+          return Array.isArray(techs) ? techs : [];
+        })(),
+        image_url: project.image_url || project.image || project.thumbnail || project.featured_image,
+        featured: project.featured || project.is_featured || false,
+        status: project.status || 'active'
       }));
     }
 
@@ -177,15 +183,7 @@ export async function getSocialLinks() {
     
     const { data, error } = await supabase
       .from('social_links')
-      .select(`
-        id,
-        platform,
-        url,
-        icon,
-        is_active,
-        created_at,
-        updated_at
-      `)
+      .select('*')
       .eq('is_active', true)
       .order('created_at', { ascending: true });
 

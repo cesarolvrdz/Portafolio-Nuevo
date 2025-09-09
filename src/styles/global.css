@@ -48,6 +48,18 @@
     @apply btn text-slate-600 hover:text-blue-600 hover:bg-blue-50 focus:ring-blue-500/25;
   }
 
+  /* Avatar con anillo animado */
+  .avatar-ring {
+    @apply absolute inset-0 rounded-full;
+    background: conic-gradient(from 0deg, #06b6d4, #8b5cf6, #ec4899, #06b6d4);
+    animation: spin-slow 8s linear infinite;
+  }
+
+  .avatar-ring::before {
+    content: '';
+    @apply absolute inset-1 rounded-full bg-transparent;
+  }
+
   /* Cards */
   .card {
     @apply bg-white/70 backdrop-blur-sm rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-slate-200/50;

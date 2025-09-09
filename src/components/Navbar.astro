@@ -17,17 +17,16 @@ const showAbout = siteSettings?.show_about !== false;
 const showProjects = siteSettings?.show_projects !== false;
 const showContact = siteSettings?.show_contact !== false;
 
-// Nombre para mostrar en el navbar
-const fullName = profile?.name || 'César Olvera';
-const displayName = fullName.split(' ')[0]; // Solo el primer nombre
+// Título profesional para el navbar
+const navbarTitle = siteSettings?.navbar_title || 'Desarrollador - Creador de Contenido';
 ---
 
 <nav class="fixed w-full bg-white/90 backdrop-blur-sm shadow-sm z-50">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex justify-between items-center py-4">
-      <!-- Logo/Nombre -->
-      <a href="#hero" class="text-2xl font-bold text-gray-900 hover:text-blue-600 transition-colors smooth-scroll">
-        {displayName}
+      <!-- Logo/Título Profesional -->
+      <a href="#hero" class="text-xl md:text-2xl font-bold text-gray-900 hover:text-blue-600 transition-colors smooth-scroll">
+        {navbarTitle}
       </a>
       
       <!-- Menú Desktop -->
