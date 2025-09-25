@@ -1,6 +1,7 @@
 ---
 import '../styles/global.css';
 import { getSeoSettings, getThemeSettings, getPublicSettings } from '../lib/data.js';
+import ThemeProvider from '../components/ThemeProvider.astro';
 
 interface Props {
 	title?: string;
@@ -144,6 +145,70 @@ const siteName = seoSettings.site_title || 'César Olvera Portfolio';
 					"https://linkedin.com/in/cesarolvrdz"
 				]
 			}
+		</script>
+		
+		<!-- Theme Provider Component -->
+		<ThemeProvider />
+		
+		<!-- Initialize accessibility and i18n systems -->
+		<script>
+			// Import and initialize systems when DOM is ready
+			document.addEventListener('DOMContentLoaded', async () => {
+				try {
+					// Initialize accessibility features
+					const { initAccessibility } = await import('../lib/accessibility.ts');
+					const accessibilityManager = initAccessibility({
+						announcements: true,
+						keyboardNavigation: true,
+						focusIndicators: true,
+						screenReaderOptimization: true,
+						colorBlindnessSupport: true
+					});
+					
+					// Initialize internationalization
+					const { initI18n } = await import('../lib/i18n.ts');
+					initI18n();
+					
+					console.log('✅ Portfolio systems initialized');
+				} catch (error) {
+					console.error('❌ Error initializing portfolio systems:', error);
+				}
+			});
+			
+			// Apply theme immediately to prevent flash
+			(() => {
+				try {
+					const savedSettings = localStorage.getItem('portfolio-settings');
+					if (savedSettings) {
+						const settings = JSON.parse(savedSettings);
+						
+						// Apply theme
+						if (settings.theme === 'dark') {
+							document.documentElement.classList.add('dark');
+						} else if (settings.theme === 'auto') {
+							if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+								document.documentElement.classList.add('dark');
+							}
+						}
+						
+						// Apply accessibility settings
+						if (settings.highContrast) {
+							document.documentElement.classList.add('high-contrast');
+						}
+						
+						if (settings.fontSize && settings.fontSize !== 100) {
+							document.documentElement.style.fontSize = `${settings.fontSize}%`;
+						}
+						
+						if (settings.reduceMotion) {
+							document.documentElement.style.setProperty('--animation-duration', '0.01ms');
+							document.documentElement.style.setProperty('--transition-duration', '0.01ms');
+						}
+					}
+				} catch (error) {
+					console.error('Error applying saved settings:', error);
+				}
+			})();
 		</script>
 	</body>
 </html>

@@ -1,5 +1,5 @@
 ---
-import { getProfile, getSiteSettings, getSocialLinks } from '../lib/cms-data.js';
+import { getProfile, getSiteSettings, getSocialLinks } from '../lib/cms-api.js';
 
 // Obtener datos dinámicos del CMS
 let profile: any = null;
@@ -18,26 +18,47 @@ try {
 const showAbout = siteSettings?.show_about !== false;
 if (!showAbout) return null;
 
-// Fallbacks para contenido
+// Configuración de contenido desde CMS
 const aboutTitle = siteSettings?.about_title || 'Sobre Mí';
-const aboutDescription = siteSettings?.about_description || profile?.bio || 'Información sobre mi experiencia profesional';
-const skills = profile?.skills || ['JavaScript', 'React', 'Node.js', 'Python', 'TypeScript', 'Tailwind CSS'];
-const featuredTechnologies = siteSettings?.featured_technologies || skills.slice(0, 8);
-const education = profile?.education || [
-  { degree: 'Ing. Sistemas Computacionales', institution: 'UAT', year: '2024' },
-  { degree: 'Téc. Contabilidad', institution: 'CBTis 105', year: '2020' }
-];
-const certifications = profile?.certifications ? JSON.parse(profile.certifications) : [];
-const languages = profile?.languages ? JSON.parse(profile.languages) : [
-  { name: 'Español', level: 'Nativo' },
-  { name: 'Inglés', level: 'Intermedio' }
-];
+const aboutDescription = siteSettings?.about_description || profile?.bio;
+const skills = profile?.skills || [];
 
-// Estadísticas personales
+// Procesar featured_technologies correctamente
+let featuredTechnologies = [];
+try {
+  if (siteSettings?.featured_technologies) {
+    featuredTechnologies = Array.isArray(siteSettings.featured_technologies) 
+      ? siteSettings.featured_technologies 
+      : JSON.parse(siteSettings.featured_technologies);
+  } else {
+    featuredTechnologies = skills.slice(0, 8);
+  }
+} catch (e) {
+  featuredTechnologies = skills.slice(0, 8);
+}
+
+const education = profile?.education || [];
+
+// Procesar certifications y languages con protección contra errores JSON
+let certifications = [];
+try {
+  certifications = profile?.certifications ? JSON.parse(profile.certifications) : [];
+} catch (e) {
+  certifications = [];
+}
+
+let languages = [];
+try {
+  languages = profile?.languages ? JSON.parse(profile.languages) : [];
+} catch (e) {
+  languages = [];
+}
+
+// Estadísticas personales desde CMS
 const stats = [
-  { number: profile?.years_experience || '4', label: 'Años de Experiencia', icon: 'experience' },
-  { number: profile?.projects_completed || '15', label: 'Proyectos Completados', icon: 'projects' },
-  { number: certifications.length || '3', label: 'Certificaciones', icon: 'certificates' },
+  { number: profile?.years_experience || '0', label: 'Años de Experiencia', icon: 'experience' },
+  { number: profile?.projects_completed || '0', label: 'Proyectos Completados', icon: 'projects' },
+  { number: certifications.length || '0', label: 'Certificaciones', icon: 'certificates' },
   { number: '100', label: 'Satisfacción del Cliente', suffix: '%', icon: 'satisfaction' }
 ];
 ---
@@ -126,27 +147,7 @@ const stats = [
           </div>
         </div>
 
-        <!-- Education -->
-        <div class="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-lg border border-white/20">
-          <h3 class="text-2xl font-bold text-slate-800 mb-6 flex items-center">
-            <svg class="w-6 h-6 mr-3 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-            </svg>
-            Formación Académica
-          </h3>
-          <div class="space-y-4">
-            {education.map((edu: any) => (
-              <div class="flex items-start space-x-4 p-4 bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl border border-purple-100">
-                <div class="w-3 h-3 bg-purple-600 rounded-full mt-2 flex-shrink-0"></div>
-                <div class="flex-grow">
-                  <h4 class="font-semibold text-slate-800">{edu.degree}</h4>
-                  <p class="text-slate-600">{edu.institution}</p>
-                  <p class="text-sm text-slate-500">{edu.year}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+        <!-- Formación Académica removida - Los datos están en la sección Education más abajo -->
 
         <!-- Technologies/Skills -->
         <div class="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-lg border border-white/20">

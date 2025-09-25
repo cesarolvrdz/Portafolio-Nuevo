@@ -4,15 +4,19 @@ import Navbar from '../components/Navbar.astro';
 import Hero from '../components/Hero.astro';
 import About from '../components/About.astro';
 import Projects from '../components/Projects.astro';
+import Certificates from '../components/Certificates.astro';
+import CVSection from '../components/CVSection.astro';
+import WorkExperience from '../components/WorkExperience.astro';
+import Education from '../components/Education.astro';
 import Contact from '../components/Contact.astro';
 import SocialLinks from '../components/SocialLinks.astro';
-import { getSectionSettings } from '../lib/data.js';
+import { getSiteSettings } from '../lib/cms-api.js';
 
 // Obtener configuración de secciones para visibilidad
 let sectionSettings: any = {};
 
 try {
-  sectionSettings = await getSectionSettings();
+  sectionSettings = await getSiteSettings();
 } catch (error) {
   console.error('Error loading section settings:', error);
 }
@@ -21,6 +25,10 @@ try {
 const showHero = sectionSettings?.show_hero !== 'false';
 const showAbout = sectionSettings?.show_about !== 'false';
 const showProjects = sectionSettings?.show_projects !== 'false';
+const showCertificates = sectionSettings?.show_certificates !== 'false';
+const showCV = sectionSettings?.show_cv !== 'false';
+const showExperience = sectionSettings?.show_experience !== 'false';
+const showEducation = sectionSettings?.show_education !== 'false';
 const showContact = sectionSettings?.show_contact !== 'false';
 const showSocialLinks = sectionSettings?.show_social_links !== 'false';
 ---
@@ -34,6 +42,13 @@ const showSocialLinks = sectionSettings?.show_social_links !== 'false';
 		{showHero && <Hero />}
 		{showAbout && <About />}
 		{showProjects && <Projects />}
+		{showCertificates && <Certificates />}
+		{showCV && <CVSection />}
+		{showEducation && <Education />}
+		{showExperience && <WorkExperience />}
 		{showContact && <Contact />}
+
+		<!-- Enlaces sociales flotantes -->
+		{showSocialLinks && <SocialLinks />}
 	</main>
 </Layout>

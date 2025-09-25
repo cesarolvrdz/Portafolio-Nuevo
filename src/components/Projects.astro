@@ -1,5 +1,5 @@
 ---
-import { getProjects, getSiteSettings } from '../lib/cms-data.js';
+import { getProjects, getSiteSettings } from '../lib/cms-api.js';
 
 // Obtener datos dinámicos del CMS
 let projects: any[] = [];
@@ -10,48 +10,7 @@ try {
   siteSettings = await getSiteSettings();
 } catch (error) {
   console.error('Error loading projects data:', error);
-  // Fallback a datos estáticos
-  projects = [
-    {
-      id: 1,
-      title: 'Portfolio Dinámico',
-      description: 'Sistema de portfolio completamente dinámico que se adapta automáticamente a cualquier estructura de datos desde Supabase. Incluye funcionalidades avanzadas de SEO, animaciones suaves y diseño responsive.',
-      image_url: '/api/placeholder/600/400',
-      technologies: ['Astro', 'TypeScript', 'TailwindCSS', 'Supabase'],
-      demo_url: 'https://cesarolvrdz.github.io/Portafolio-Nuevo/',
-      github_url: 'https://github.com/cesarolvrdz/Portafolio-Nuevo',
-      status: 'Completado',
-      featured: true,
-      category: 'Web Development',
-      created_at: '2025-01-01'
-    },
-    {
-      id: 2,
-      title: 'Sistema de Gestión Empresarial',
-      description: 'Aplicación web full-stack para gestión empresarial con dashboard interactivo, reportes en tiempo real y sistema de autenticación robusto.',
-      image_url: '/api/placeholder/600/400',
-      technologies: ['React', 'Node.js', 'PostgreSQL', 'Express'],
-      demo_url: '#',
-      github_url: '#',
-      status: 'En Desarrollo',
-      featured: true,
-      category: 'Full Stack',
-      created_at: '2024-12-15'
-    },
-    {
-      id: 3,
-      title: 'App Móvil de Productividad',
-      description: 'Aplicación móvil multiplataforma para gestión de tareas y productividad personal con sincronización en la nube.',
-      image_url: '/api/placeholder/600/400',
-      technologies: ['React Native', 'Firebase', 'Redux'],
-      demo_url: '#',
-      github_url: '#',
-      status: 'Planificado',
-      featured: false,
-      category: 'Mobile Development',
-      created_at: '2024-11-01'
-    }
-  ];
+  projects = [];
 }
 
 // Ordenar proyectos: destacados primero, luego por fecha
@@ -70,16 +29,52 @@ const sectionDescription = siteSettings?.projects_description || 'Explora mi tra
 // Función para obtener el estado del proyecto con colores
 const getStatusInfo = (status: string) => {
   const statusMap: { [key: string]: { text: string, color: string, bgColor: string } } = {
+    // Estados completados
     'completado': { text: 'Completado', color: 'text-green-700', bgColor: 'bg-green-100' },
     'completed': { text: 'Completado', color: 'text-green-700', bgColor: 'bg-green-100' },
+    'finished': { text: 'Completado', color: 'text-green-700', bgColor: 'bg-green-100' },
+    'done': { text: 'Completado', color: 'text-green-700', bgColor: 'bg-green-100' },
+    
+    // Estados en desarrollo
     'en desarrollo': { text: 'En Desarrollo', color: 'text-yellow-700', bgColor: 'bg-yellow-100' },
     'in progress': { text: 'En Desarrollo', color: 'text-yellow-700', bgColor: 'bg-yellow-100' },
+    'in-progress': { text: 'En Desarrollo', color: 'text-yellow-700', bgColor: 'bg-yellow-100' },
+    'development': { text: 'En Desarrollo', color: 'text-yellow-700', bgColor: 'bg-yellow-100' },
+    'developing': { text: 'En Desarrollo', color: 'text-yellow-700', bgColor: 'bg-yellow-100' },
+    'active': { text: 'En Desarrollo', color: 'text-yellow-700', bgColor: 'bg-yellow-100' },
+    'working': { text: 'En Desarrollo', color: 'text-yellow-700', bgColor: 'bg-yellow-100' },
+    
+    // Estados planificados
     'planificado': { text: 'Planificado', color: 'text-blue-700', bgColor: 'bg-blue-100' },
-    'planned': { text: 'Planificado', color: 'text-blue-700', bgColor: 'bg-blue-100' }
+    'planned': { text: 'Planificado', color: 'text-blue-700', bgColor: 'bg-blue-100' },
+    'planning': { text: 'Planificado', color: 'text-blue-700', bgColor: 'bg-blue-100' },
+    'draft': { text: 'Planificado', color: 'text-blue-700', bgColor: 'bg-blue-100' },
+    
+    // Estados pendientes
+    'pendiente': { text: 'Pendiente', color: 'text-orange-700', bgColor: 'bg-orange-100' },
+    'pending': { text: 'Pendiente', color: 'text-orange-700', bgColor: 'bg-orange-100' },
+    'waiting': { text: 'Pendiente', color: 'text-orange-700', bgColor: 'bg-orange-100' },
+    'on hold': { text: 'Pendiente', color: 'text-orange-700', bgColor: 'bg-orange-100' },
+    
+    // Estados pausados
+    'pausado': { text: 'Pausado', color: 'text-gray-700', bgColor: 'bg-gray-100' },
+    'paused': { text: 'Pausado', color: 'text-gray-700', bgColor: 'bg-gray-100' },
+    'stopped': { text: 'Pausado', color: 'text-gray-700', bgColor: 'bg-gray-100' },
+    'halted': { text: 'Pausado', color: 'text-gray-700', bgColor: 'bg-gray-100' },
+    
+    // Estados cancelados
+    'cancelado': { text: 'Cancelado', color: 'text-red-700', bgColor: 'bg-red-100' },
+    'cancelled': { text: 'Cancelado', color: 'text-red-700', bgColor: 'bg-red-100' },
+    'canceled': { text: 'Cancelado', color: 'text-red-700', bgColor: 'bg-red-100' },
+    'abandoned': { text: 'Cancelado', color: 'text-red-700', bgColor: 'bg-red-100' }
   };
   
-  const key = status?.toLowerCase() || 'completado';
-  return statusMap[key] || statusMap['completado'];
+  if (!status) {
+    return { text: 'Sin Estado', color: 'text-gray-700', bgColor: 'bg-gray-100' };
+  }
+  
+  const key = status.toLowerCase().trim();
+  return statusMap[key] || { text: status, color: 'text-gray-700', bgColor: 'bg-gray-100' };
 };
 ---
 
@@ -121,8 +116,8 @@ const getStatusInfo = (status: string) => {
     <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
       {sortedProjects.map((project) => {
         const statusInfo = getStatusInfo(project.status || '');
-        const technologies = project.technologies || project.tech_tags || project.skills || [];
-        const demoUrl = project.demo_url || project.project_url || project.live_url;
+        const technologies = project.technologies || project.tech_tags || project.skills || project.tech || [];
+        const demoUrl = project.demo_url || project.project_url || project.live_url || project.link;
         const githubUrl = project.github_url || project.repository_url;
         
         return (
@@ -141,9 +136,9 @@ const getStatusInfo = (status: string) => {
 
             {/* Project Image */}
             <div class="relative h-48 bg-gradient-to-br from-slate-100 to-slate-200 overflow-hidden">
-              {project.image_url ? (
+              {project.image ? (
                 <img 
-                  src={project.image_url} 
+                  src={project.image} 
                   alt={project.title}
                   class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                 />

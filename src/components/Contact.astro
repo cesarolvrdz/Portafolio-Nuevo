@@ -1,5 +1,5 @@
 ---
-import { getProfile, getSiteSettings, getSocialLinks } from '../lib/cms-data.js';
+import { getProfile, getSiteSettings, getSocialLinks } from '../lib/cms-api.js';
 
 // Obtener datos dinámicos del CMS
 let profile: any = null;
@@ -18,12 +18,12 @@ try {
 const showContact = siteSettings?.show_contact !== false;
 if (!showContact) return null;
 
-// Configuración de contacto con fallbacks
-const contactEmail = siteSettings?.contact_email || profile?.email || 'cesolvrdz@gmail.com';
-const contactPhone = siteSettings?.contact_phone || profile?.phone || '(833) 107-7911';
-const contactLocation = siteSettings?.contact_location || profile?.location || 'México';
+// Configuración de contacto desde CMS
+const contactEmail = siteSettings?.contact_email || profile?.email;
+const contactPhone = siteSettings?.contact_phone || profile?.phone;
+const contactLocation = siteSettings?.contact_location || profile?.location;
 const availability = profile?.available_for_work;
-const responseTime = siteSettings?.response_time || '24-48 horas';
+const responseTime = siteSettings?.response_time;
 
 // Servicios disponibles
 const services = [
@@ -41,21 +41,22 @@ const contactMethods = [
     href: `mailto:${contactEmail}?subject=Consulta sobre proyecto&body=Hola César,%0D%0A%0D%0AMe gustaría hablar contigo sobre...`,
     icon: 'email',
     primary: true
-  },
-  {
-    name: 'Teléfono',
-    value: contactPhone,
-    href: `tel:${contactPhone.replace(/[^0-9]/g, '')}`,
-    icon: 'phone',
-    primary: false
-  },
-  {
-    name: 'WhatsApp',
-    value: 'Chat directo',
-    href: `https://wa.me/${contactPhone.replace(/[^0-9]/g, '')}?text=Hola César, me interesa hablar contigo sobre un proyecto`,
-    icon: 'whatsapp',
-    primary: false
   }
+  // Teléfono y WhatsApp temporalmente ocultos
+  // {
+  //   name: 'Teléfono',
+  //   value: contactPhone,
+  //   href: `tel:${contactPhone.replace(/[^0-9]/g, '')}`,
+  //   icon: 'phone',
+  //   primary: false
+  // },
+  // {
+  //   name: 'WhatsApp',
+  //   value: 'Chat directo',
+  //   href: `https://wa.me/${contactPhone.replace(/[^0-9]/g, '')}?text=Hola César, me interesa hablar contigo sobre un proyecto`,
+  //   icon: 'whatsapp',
+  //   primary: false
+  // }
 ];
 ---
 
@@ -112,7 +113,7 @@ const contactMethods = [
                   href={method.href}
                   class={`inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${method.primary ? 'bg-blue-500 hover:bg-blue-600 text-white' : 'bg-white/20 hover:bg-white/30 text-white'}`}
                 >
-                  Contactar
+                  📧 Contáctame
                   <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
                   </svg>
@@ -156,24 +157,6 @@ const contactMethods = [
             </div>
             <p class="text-blue-200">{contactLocation}</p>
             <p class="text-xs text-blue-300 mt-2">Trabajo remoto disponible</p>
-          </div>
-        )}
-
-        {/* Resume Download */}
-        {profile?.resume_url && (
-          <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-            <h3 class="text-lg font-semibold text-white mb-3">Currículum</h3>
-            <a 
-              href={profile.resume_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              class="w-full bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white px-4 py-3 rounded-lg transition-all duration-200 font-medium text-center block"
-            >
-              Descargar CV
-              <svg class="w-4 h-4 ml-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-              </svg>
-            </a>
           </div>
         )}
       </div>

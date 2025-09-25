@@ -4,7 +4,7 @@ import {
   getProjects as getCMSProjects,
   getSocialLinks as getCMSSocialLinks,
   getSiteSettings as getCMSSiteSettings
-} from './cms-data.js';
+} from './cms-api.js';
 
 // Re-exportar funciones del CMS con nombres originales para compatibilidad
 export const getProfile = getCMSProfile;

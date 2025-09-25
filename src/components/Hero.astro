@@ -1,32 +1,51 @@
 ---
-import { getProfile, getSiteSettings, getSocialLinks } from '../lib/cms-data.js';
+import { 
+  getProfile, 
+  getSiteSettings, 
+  getSocialLinks,
+  getAvailability 
+} from '../lib/cms-api.js';
 
 // Obtener datos dinámicos del CMS
 let profile: any = null;
 let siteSettings: any = {};
 let socialLinks: any[] = [];
+let availability: any = null;
 
 try {
-  profile = await getProfile();
-  siteSettings = await getSiteSettings();
-  socialLinks = await getSocialLinks();
+  [profile, siteSettings, socialLinks, availability] = await Promise.all([
+    getProfile(),
+    getSiteSettings(),
+    getSocialLinks(),
+    getAvailability()
+  ]);
 } catch (error) {
   console.error('Error loading hero data:', error);
 }
 
-// Configuración desde CMS o fallbacks
-const fullName = profile?.name || 'César Olvera Rodríguez';
-const firstName = fullName.split(' ')[0];
+// Configuración desde CMS solamente
+const fullName = profile?.name;
+const firstName = fullName ? fullName.split(' ')[0] : '';
 const heroTitle = siteSettings?.hero_title || fullName;
-const heroSubtitle = siteSettings?.hero_subtitle || profile?.title || 'Desarrollador Full Stack';
-const heroDescription = profile?.bio || 'Desarrollador apasionado por crear experiencias digitales excepcionales.';
-const heroLocation = profile?.location || 'México';
+const heroSubtitle = siteSettings?.hero_subtitle || profile?.title;
+const heroDescription = profile?.bio;
+const heroLocation = profile?.location;
 const heroEmail = profile?.email;
 const heroPhone = profile?.phone;
 const avatarUrl = profile?.avatar_url;
 
 // Skills desde el perfil (JSONB array)
-const skills = profile?.skills || ['JavaScript', 'React', 'Node.js', 'Laravel', 'Vue.js'];
+const skills = Array.isArray(profile?.skills) ? profile.skills : [];
+
+// Estado de disponibilidad
+const isAvailable = availability?.is_available || false;
+const availabilityText = availability?.status_text || (isAvailable ? '💚 Disponible para nuevos proyectos' : '🔴 No disponible actualmente');
+const availabilityDetails = availability?.details;
+const nextAvailableDate = availability?.next_available_date;
+
+// CTAs dinámicos basados en disponibilidad
+const primaryCTA = { text: '📧 Contáctame', action: 'contact' };
+const secondaryCTA = { text: '📄 Descargar CV', action: 'download-cv' };
 ---
 
 <!-- Hero Section con Diseño Moderno -->
@@ -44,40 +63,54 @@ const skills = profile?.skills || ['JavaScript', 'React', 'Node.js', 'Laravel', 
 
   <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
     <div class="text-center">
-      <!-- Avatar del Perfil -->
+
+
+      <!-- Avatar del Perfil con efectos mejorados -->
       {avatarUrl && (
         <div class="flex justify-center mb-8">
-          <div class="relative w-32 h-32 md:w-40 md:h-40">
-            <!-- Anillo animado de gradiente -->
-            <div class="absolute inset-0 rounded-full bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 animate-spin-slow"></div>
-            <!-- Avatar -->
-            <div class="absolute inset-1 rounded-full overflow-hidden bg-white shadow-2xl">
+          <div class="relative w-36 h-36 md:w-44 md:h-44 group">
+            <!-- Anillos animados múltiples -->
+            <div class="absolute inset-0 rounded-full bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 animate-spin-slow opacity-75 group-hover:opacity-100 transition-opacity"></div>
+            <div class="absolute inset-1 rounded-full bg-gradient-to-r from-pink-400 via-purple-400 to-cyan-400 animate-spin-reverse opacity-50 group-hover:opacity-75 transition-opacity"></div>
+            
+            <!-- Avatar con efectos hover -->
+            <div class="absolute inset-2 rounded-full overflow-hidden bg-white shadow-2xl group-hover:shadow-3xl transition-shadow duration-500">
               <img 
                 src={avatarUrl} 
                 alt={`Avatar de ${fullName}`}
-                class="w-full h-full object-cover transform hover:scale-110 transition-transform duration-500"
+                class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700 filter group-hover:brightness-110"
                 loading="eager"
               />
+              <!-- Overlay sutil en hover -->
+              <div class="absolute inset-0 bg-gradient-to-t from-transparent to-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
             </div>
+            
+            <!-- Pulse effect para disponibilidad -->
+            {isAvailable && (
+              <div class="absolute -top-2 -right-2 w-6 h-6 bg-green-400 rounded-full animate-pulse shadow-lg"></div>
+            )}
           </div>
         </div>
       )}
 
-      <!-- Title con animación de escritura -->
-      <h1 class="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
-        <span class="bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+      <!-- Title con animación de escritura mejorada -->
+      <h1 class="text-5xl md:text-7xl lg:text-8xl font-bold text-white mb-6 leading-tight">
+        <span class="bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent animate-gradient-x">
           {heroTitle}
         </span>
       </h1>
 
-      <!-- Subtitle animado -->
+      <!-- Subtitle animado con typing effect -->
       <div class="mb-8">
-        <p class="text-xl md:text-2xl text-white/90 font-light max-w-3xl mx-auto leading-relaxed">
-          {heroSubtitle}
+        <p class="text-xl md:text-3xl text-white/90 font-light max-w-4xl mx-auto leading-relaxed mb-4">
+          <span id="typing-text" class="border-r-2 border-white/70 animate-blink pr-2">
+            {heroSubtitle}
+          </span>
         </p>
+        
         {heroLocation && (
-          <div class="flex items-center justify-center mt-4 text-white/70">
-            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+          <div class="flex items-center justify-center mt-4 text-white/70 hover:text-white/90 transition-colors duration-300">
+            <svg class="w-5 h-5 mr-2 animate-bounce" fill="currentColor" viewBox="0 0 20 20">
               <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
             </svg>
             {heroLocation}
@@ -85,87 +118,99 @@ const skills = profile?.skills || ['JavaScript', 'React', 'Node.js', 'Laravel', 
         )}
       </div>
 
-      <!-- Description -->
-      <p class="text-lg text-white/80 max-w-2xl mx-auto mb-12 leading-relaxed">
+      <!-- Description mejorada -->
+      <p class="text-lg md:text-xl text-white/80 max-w-3xl mx-auto mb-8 leading-relaxed">
         {heroDescription}
       </p>
 
-      <!-- Skills Pills -->
+      <!-- Detalles de disponibilidad adicionales -->
+      {availabilityDetails && (
+        <div class="max-w-2xl mx-auto mb-8 p-4 bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20">
+          <p class="text-white/90 text-sm leading-relaxed">{availabilityDetails}</p>
+          {nextAvailableDate && !isAvailable && (
+            <p class="text-white/70 text-xs mt-2">
+              🗓️ Próxima disponibilidad: {new Date(nextAvailableDate).toLocaleDateString('es-ES')}
+            </p>
+          )}
+        </div>
+      )}
+
+      <!-- Skills Pills mejoradas -->
       <div class="flex flex-wrap justify-center gap-3 mb-12">
-        {skills.map((skill: string) => (
-          <span class="px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full text-white/90 text-sm font-medium hover:bg-white/20 transition-all duration-300 hover:scale-105">
+        {skills.map((skill: string, index: number) => (
+          <span 
+            class="px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full text-white/90 text-sm font-medium hover:bg-white/20 transition-all duration-300 hover:scale-105 hover:shadow-lg"
+            style={`animation-delay: ${index * 100}ms`}
+          >
             {skill}
           </span>
         ))}
       </div>
 
-      <!-- CTA Buttons -->
+      <!-- CTAs Dinámicos Mejorados -->
       <div class="flex flex-col sm:flex-row gap-6 justify-center items-center">
-        <a 
-          href="#projects" 
-          class="group inline-flex items-center px-8 py-4 bg-gradient-to-r from-cyan-500 to-purple-600 text-white font-semibold rounded-xl shadow-2xl hover:shadow-cyan-500/25 transform hover:-translate-y-1 transition-all duration-300 hover:scale-105"
+        <!-- CTA Principal Dinámico -->
+        <button 
+          onclick="handlePrimaryCTA('contact')"
+          class={`group inline-flex items-center px-8 py-4 font-bold text-lg rounded-xl shadow-2xl transform hover:-translate-y-1 transition-all duration-300 hover:scale-105 ${
+            isAvailable 
+              ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white hover:shadow-green-500/25 animate-pulse-slow' 
+              : 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:shadow-blue-500/25'
+          }`}
         >
-          <span class="mr-2">Ver Mis Proyectos</span>
-          <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"></path>
-          </svg>
-        </a>
-
-        {(heroEmail || heroPhone) && (
-          <a 
-            href={heroPhone ? `tel:${heroPhone}` : `mailto:${heroEmail}`}
-            class="group inline-flex items-center px-8 py-4 bg-white/10 backdrop-blur-sm border border-white/20 text-white font-semibold rounded-xl hover:bg-white/20 transform hover:-translate-y-1 transition-all duration-300"
-          >
-            {heroPhone ? (
-              <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"></path>
-              </svg>
+          <span class="mr-3">{primaryCTA.text}</span>
+          <svg class="w-6 h-6 group-hover:translate-x-1 transition-transform" fill="currentColor" viewBox="0 0 20 20">
+            {isAvailable ? (
+              <path d="M10 2L3 7v11a1 1 0 001 1h3v-6h6v6h3a1 1 0 001-1V7l-7-5z"></path>
             ) : (
-              <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"></path>
-                <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"></path>
-              </svg>
+              <path d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zM4 7h12v9a1 1 0 01-1 1H5a1 1 0 01-1-1V7z"></path>
             )}
-            {heroPhone ? 'Llamar' : 'Contactar'}
-          </a>
+          </svg>
+        </button>
+
+        <!-- CTA Secundario -->
+        <button 
+          onclick="handleSecondaryCTA('download-cv')"
+          class="group inline-flex items-center px-8 py-4 bg-white/10 backdrop-blur-sm border-2 border-white/20 text-white font-semibold text-lg rounded-xl hover:bg-white/20 hover:border-white/40 transform hover:-translate-y-1 transition-all duration-300 hover:scale-105 hover:shadow-xl"
+        >
+          <span class="mr-3">{secondaryCTA.text}</span>
+          <svg class="w-6 h-6 group-hover:translate-x-1 transition-transform" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"></path>
+          </svg>
+        </button>
+
+        <!-- CTA de Contacto Rápido -->
+        {(heroEmail || heroPhone) && (
+          <div class="flex gap-3">
+            {heroEmail && (
+              <a 
+                href={`mailto:${heroEmail}`}
+                class="group p-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full text-white hover:bg-white/20 transition-all duration-300 hover:scale-110 hover:shadow-lg"
+                title={`Enviar email a ${heroEmail}`}
+              >
+                <svg class="w-6 h-6 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"></path>
+                  <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"></path>
+                </svg>
+              </a>
+            )}
+            
+            {heroPhone && (
+              <a 
+                href={`tel:${heroPhone}`}
+                class="group p-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full text-white hover:bg-white/20 transition-all duration-300 hover:scale-110 hover:shadow-lg"
+                title={`Llamar a ${heroPhone}`}
+              >
+                <svg class="w-6 h-6 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"></path>
+                </svg>
+              </a>
+            )}
+          </div>
         )}
       </div>
 
-      <!-- Social Links -->
-      {socialLinks && socialLinks.length > 0 && socialLinks.filter(link => link && link.url && link.platform).length > 0 && (
-        <div class="mt-12 pt-8 border-t border-white/20">
-          <p class="text-white/60 text-sm mb-4">Sígueme en:</p>
-          <div class="flex justify-center space-x-6">
-            {socialLinks
-              .filter(link => link && link.url && link.platform && link.url.trim() !== '')
-              .map((link: any) => (
-              <a 
-                href={link.url} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                class="text-white/70 hover:text-white transform hover:scale-125 transition-all duration-300"
-                title={link.display_name || link.platform}
-              >
-                {link.platform.toLowerCase() === 'github' && (
-                  <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-                  </svg>
-                )}
-                {(link.platform.toLowerCase() === 'twitter' || link.platform.toLowerCase() === 'x') && (
-                  <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
-                  </svg>
-                )}
-                {link.platform.toLowerCase() === 'instagram' && (
-                  <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-                  </svg>
-                )}
-              </a>
-            ))}
-          </div>
-        </div>
-      )}
+
     </div>
 
     <!-- Scroll indicator -->
@@ -179,6 +224,183 @@ const skills = profile?.skills || ['JavaScript', 'React', 'Node.js', 'Laravel', 
     </div>
   </div>
 </section>
+
+<script define:vars={{ 
+  heroData: {
+    isAvailable,
+    primaryCTA,
+    secondaryCTA,
+    heroEmail: heroEmail || "",
+    heroPhone: heroPhone || "",
+    profile: profile
+  }
+}}>
+  // Manejar CTA principal dinámico
+  function handlePrimaryCTA(action) {
+    console.log('🎯 Primary CTA clicked:', action);
+    
+    switch(action) {
+      case 'contact':
+        // Scroll al formulario de contacto o abrir modal
+        const contactSection = document.getElementById('contact');
+        if (contactSection) {
+          contactSection.scrollIntoView({ behavior: 'smooth' });
+        }
+        showHeroNotification('📧 ¡Hablemos! Desplazándote al formulario de contacto...', 'success');
+        break;
+        
+      case 'schedule':
+        // Abrir calendly o sistema de agendamiento
+        showHeroNotification('📅 Abriendo sistema de agendamiento...', 'info');
+        // Aquí integrarías con Calendly, Cal.com, etc.
+        break;
+        
+      default:
+        console.warn('Unknown primary CTA action:', action);
+    }
+  }
+
+  // Manejar CTA secundario
+  async function handleSecondaryCTA(action) {
+    console.log('📄 Secondary CTA clicked:', action);
+    
+    switch(action) {
+      case 'download-cv':
+        // Descargar CV usando sistema híbrido
+        try {
+          // Importar dinámicamente el CVApiService
+          const { default: CVApiService } = await import('../lib/cv-api.js');
+          const cvService = new CVApiService();
+          
+          // Obtener CV actual
+          const currentCV = await cvService.getCurrentCV('es');
+          
+          if (currentCV?.file_url) {
+            const link = document.createElement('a');
+            link.href = currentCV.file_url;
+            link.download = `${currentCV.title || 'CV'}.pdf`;
+            link.target = '_blank';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            // Intentar incrementar contador
+            try {
+              await cvService.downloadCV(currentCV.id);
+            } catch (e) {
+              console.warn('No se pudo incrementar contador:', e.message);
+            }
+            
+            showHeroNotification(`📄 ¡Descargando ${currentCV.title}! Verifica tu carpeta de descargas.`, 'success');
+          } else {
+            throw new Error('CV no disponible');
+          }
+        } catch (error) {
+          console.error('Error downloading CV:', error);
+          // Fallback: scroll a la sección de CV
+          const cvSection = document.getElementById('cv');
+          if (cvSection) {
+            cvSection.scrollIntoView({ behavior: 'smooth' });
+            showHeroNotification('📄 Redirigiendo a la sección de CV...', 'info');
+          } else {
+            showHeroNotification('📄 CV no disponible en este momento', 'error');
+          }
+        }
+        break;
+        
+      default:
+        console.warn('Unknown secondary CTA action:', action);
+    }
+  }
+
+  // Mostrar notificaciones del hero
+  function showHeroNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg transition-all duration-300 transform translate-x-full ${
+      type === 'success' ? 'bg-green-500 text-white' :
+      type === 'error' ? 'bg-red-500 text-white' :
+      'bg-blue-500 text-white'
+    }`;
+    notification.textContent = message;
+    
+    document.body.appendChild(notification);
+    
+    // Animación de entrada
+    setTimeout(() => {
+      notification.classList.remove('translate-x-full');
+    }, 100);
+    
+    // Remover después de 3 segundos
+    setTimeout(() => {
+      notification.classList.add('translate-x-full');
+      setTimeout(() => {
+        if (document.body.contains(notification)) {
+          document.body.removeChild(notification);
+        }
+      }, 300);
+    }, 3000);
+  }
+
+  // Typing animation para el subtitle
+  function initTypingAnimation() {
+    const typingElement = document.getElementById('typing-text');
+    if (!typingElement) return;
+    
+    const text = typingElement.textContent || '';
+    typingElement.textContent = '';
+    
+    let i = 0;
+    function typeWriter() {
+      if (i < text.length && typingElement) {
+        typingElement.textContent += text.charAt(i);
+        i++;
+        setTimeout(typeWriter, 100);
+      }
+    }
+    
+    // Comenzar después de un pequeño delay
+    setTimeout(typeWriter, 500);
+  }
+
+  // Inicializar animaciones cuando el DOM esté listo
+  document.addEventListener('DOMContentLoaded', () => {
+    initTypingAnimation();
+    
+    // Log de disponibilidad
+    console.log('👋 Hero loaded - Available:', heroData.isAvailable);
+  });
+
+  // Smooth scroll mejorado para enlaces internos
+  document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+    anchor.addEventListener('click', function (e) {
+      e.preventDefault();
+      const href = this.getAttribute('href');
+      if (href) {
+        const target = document.querySelector(href);
+        if (target) {
+          target.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
+        }
+      }
+    });
+  });
+
+  // Exponer funciones globalmente para los botones
+  window.handlePrimaryCTA = handlePrimaryCTA;
+  window.handleSecondaryCTA = handleSecondaryCTA;
+</script>
+
+<!-- Script adicional para asegurar que las funciones estén disponibles -->
+<script is:inline>
+  // Verificar que las funciones estén disponibles
+  document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM loaded, checking functions...');
+    console.log('handlePrimaryCTA available:', typeof window.handlePrimaryCTA);
+    console.log('handleSecondaryCTA available:', typeof window.handleSecondaryCTA);
+  });
+</script>
 
 <style>
   @keyframes blob {
@@ -196,8 +418,77 @@ const skills = profile?.skills || ['JavaScript', 'React', 'Node.js', 'Laravel', 
     }
   }
 
+  @keyframes gradient-x {
+    0%, 100% {
+      background-size: 200% 200%;
+      background-position: left center;
+    }
+    50% {
+      background-size: 200% 200%;
+      background-position: right center;
+    }
+  }
+
+  @keyframes pulse-slow {
+    0%, 100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    50% {
+      transform: scale(1.05);
+      opacity: 0.8;
+    }
+  }
+
+  @keyframes spin-slow {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes spin-reverse {
+    0% {
+      transform: rotate(360deg);
+    }
+    100% {
+      transform: rotate(0deg);
+    }
+  }
+
+  @keyframes blink {
+    0%, 50% {
+      border-color: transparent;
+    }
+    51%, 100% {
+      border-color: currentColor;
+    }
+  }
+
   .animate-blob {
     animation: blob 7s infinite;
+  }
+
+  .animate-gradient-x {
+    animation: gradient-x 3s ease infinite;
+  }
+
+  .animate-pulse-slow {
+    animation: pulse-slow 3s ease-in-out infinite;
+  }
+
+  .animate-spin-slow {
+    animation: spin-slow 3s linear infinite;
+  }
+
+  .animate-spin-reverse {
+    animation: spin-reverse 4s linear infinite;
+  }
+
+  .animate-blink {
+    animation: blink 1s infinite;
   }
 
   .animation-delay-2000 {
@@ -210,5 +501,58 @@ const skills = profile?.skills || ['JavaScript', 'React', 'Node.js', 'Laravel', 
   
   .grid-pattern {
     background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+
+  /* Mejoras para hover states */
+  .group:hover .group-hover\:shadow-3xl {
+    box-shadow: 0 35px 60px -12px rgba(0, 0, 0, 0.25);
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 640px) {
+    .animate-blob {
+      display: none;
+    }
+  }
+
+  /* Custom gradients para CTAs */
+  .bg-gradient-cta-primary {
+    background: linear-gradient(135deg, #10b981, #059669, #047857);
+  }
+
+  .bg-gradient-cta-secondary {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8, #1e40af);
+  }
+
+  /* Smooth scrolling para todo el documento */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Mejoras de accesibilidad */
+  @media (prefers-reduced-motion: reduce) {
+    .animate-blob,
+    .animate-gradient-x,
+    .animate-pulse-slow,
+    .animate-spin-slow,
+    .animate-spin-reverse,
+    .animate-blink {
+      animation: none;
+    }
+  }
+
+  /* Efectos de particles para disponibilidad */
+  .availability-glow {
+    position: relative;
+  }
+
+  .availability-glow::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: inherit;
+    background: linear-gradient(45deg, transparent, rgba(34, 197, 94, 0.3), transparent);
+    animation: pulse-slow 2s ease-in-out infinite;
+    z-index: -1;
   }
 </style>

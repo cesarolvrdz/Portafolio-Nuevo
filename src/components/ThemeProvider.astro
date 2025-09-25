@@ -1,0 +1,792 @@
+---
+// ThemeProvider component para gestión de temas y configuraciones
+---
+
+<div id="theme-provider" class="fixed bottom-6 right-6 z-50">
+  <!-- Botón principal de configuraciones -->
+  <div class="relative">
+    <!-- Botón flotante de configuraciones -->
+    <button 
+      id="settings-toggle"
+      class="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-full w-14 h-14 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110 flex items-center justify-center group"
+      aria-label="Abrir configuraciones"
+    >
+      <svg 
+        class="w-6 h-6 transition-transform duration-300 group-hover:rotate-90" 
+        fill="currentColor" 
+        viewBox="0 0 20 20"
+      >
+        <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"></path>
+        <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"></path>
+      </svg>
+    </button>
+
+    <!-- Panel de configuraciones -->
+    <div 
+      id="settings-panel"
+      class="absolute bottom-16 right-0 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 w-80 transform transition-all duration-300 scale-0 origin-bottom-right opacity-0"
+    >
+      <!-- Header del panel -->
+      <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+        <div class="flex items-center justify-between">
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+            ⚙️ Configuraciones
+          </h3>
+          <button 
+            id="settings-close"
+            class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+            aria-label="Cerrar configuraciones"
+          >
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Contenido del panel -->
+      <div class="p-6 space-y-6">
+        
+        <!-- Selector de Tema -->
+        <div class="space-y-3">
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            🎨 Tema de Color
+          </label>
+          <div class="grid grid-cols-3 gap-2">
+            <button 
+              data-theme="light"
+              class="theme-option flex flex-col items-center p-3 rounded-lg border-2 transition-all duration-200 hover:scale-105"
+            >
+              <div class="w-8 h-8 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full mb-2"></div>
+              <span class="text-xs font-medium">Claro</span>
+            </button>
+            <button 
+              data-theme="dark"
+              class="theme-option flex flex-col items-center p-3 rounded-lg border-2 transition-all duration-200 hover:scale-105"
+            >
+              <div class="w-8 h-8 bg-gradient-to-br from-gray-700 to-gray-900 rounded-full mb-2"></div>
+              <span class="text-xs font-medium">Oscuro</span>
+            </button>
+            <button 
+              data-theme="auto"
+              class="theme-option flex flex-col items-center p-3 rounded-lg border-2 transition-all duration-200 hover:scale-105"
+            >
+              <div class="w-8 h-8 bg-gradient-to-br from-yellow-400 to-blue-800 rounded-full mb-2"></div>
+              <span class="text-xs font-medium">Auto</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Selector de Idioma -->
+        <div class="space-y-3">
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            🌐 Idioma
+          </label>
+          <select 
+            id="language-select"
+            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors"
+          >
+            <option value="es">🇪🇸 Español</option>
+            <option value="en">🇺🇸 English</option>
+            <option value="pt">🇧🇷 Português</option>
+          </select>
+        </div>
+
+        <!-- Configuraciones de Accesibilidad -->
+        <div class="space-y-3">
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            ♿ Accesibilidad
+          </label>
+          
+          <!-- Reducir movimiento -->
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-gray-600 dark:text-gray-400">Reducir animaciones</span>
+            <button 
+              id="reduce-motion-toggle"
+              class="toggle-switch w-11 h-6 bg-gray-200 dark:bg-gray-600 rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              role="switch"
+              aria-checked="false"
+            >
+              <div class="toggle-circle w-5 h-5 bg-white rounded-full transition-transform duration-200 transform translate-x-0.5"></div>
+            </button>
+          </div>
+
+          <!-- Alto contraste -->
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-gray-600 dark:text-gray-400">Alto contraste</span>
+            <button 
+              id="high-contrast-toggle"
+              class="toggle-switch w-11 h-6 bg-gray-200 dark:bg-gray-600 rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              role="switch"
+              aria-checked="false"
+            >
+              <div class="toggle-circle w-5 h-5 bg-white rounded-full transition-transform duration-200 transform translate-x-0.5"></div>
+            </button>
+          </div>
+
+          <!-- Tamaño de fuente -->
+          <div class="space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-sm text-gray-600 dark:text-gray-400">Tamaño de fuente</span>
+              <span id="font-size-display" class="text-sm font-medium text-indigo-600 dark:text-indigo-400">100%</span>
+            </div>
+            <input 
+              type="range" 
+              id="font-size-slider"
+              min="80" 
+              max="120" 
+              value="100" 
+              step="10"
+              class="w-full h-2 bg-gray-200 dark:bg-gray-600 rounded-lg appearance-none cursor-pointer slider"
+            >
+            <div class="flex justify-between text-xs text-gray-500 dark:text-gray-400">
+              <span>80%</span>
+              <span>100%</span>
+              <span>120%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Configuraciones de Performance -->
+        <div class="space-y-3">
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            ⚡ Rendimiento
+          </label>
+          
+          <!-- Lazy loading -->
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-gray-600 dark:text-gray-400">Carga diferida de imágenes</span>
+            <button 
+              id="lazy-loading-toggle"
+              class="toggle-switch w-11 h-6 bg-gray-200 dark:bg-gray-600 rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              role="switch"
+              aria-checked="true"
+            >
+              <div class="toggle-circle w-5 h-5 bg-white rounded-full transition-transform duration-200 transform translate-x-5"></div>
+            </button>
+          </div>
+
+          <!-- Prefetch -->
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-gray-600 dark:text-gray-400">Precarga de páginas</span>
+            <button 
+              id="prefetch-toggle"
+              class="toggle-switch w-11 h-6 bg-gray-200 dark:bg-gray-600 rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              role="switch"
+              aria-checked="true"
+            >
+              <div class="toggle-circle w-5 h-5 bg-white rounded-full transition-transform duration-200 transform translate-x-5"></div>
+            </button>
+          </div>
+        </div>
+
+        <!-- Botones de acción -->
+        <div class="pt-4 border-t border-gray-200 dark:border-gray-700 space-y-3">
+          <button 
+            id="reset-settings"
+            class="w-full px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+          >
+            🔄 Restaurar configuraciones
+          </button>
+          
+          <button 
+            id="export-settings"
+            class="w-full px-4 py-2 text-sm font-medium text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 rounded-lg hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors"
+          >
+            📤 Exportar configuraciones
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notificación de configuraciones -->
+  <div 
+    id="settings-notification"
+    class="fixed top-6 right-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg p-4 transform transition-all duration-300 translate-x-full opacity-0 max-w-sm"
+  >
+    <div class="flex items-start">
+      <div class="flex-shrink-0">
+        <div class="w-6 h-6 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
+          <svg class="w-4 h-4 text-green-600 dark:text-green-400" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+          </svg>
+        </div>
+      </div>
+      <div class="ml-3 flex-1">
+        <p id="notification-message" class="text-sm font-medium text-gray-900 dark:text-white">
+          Configuración aplicada
+        </p>
+        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          Los cambios se han guardado automáticamente
+        </p>
+      </div>
+      <button 
+        id="notification-close"
+        class="ml-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+      >
+        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+          <path d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Declaraciones de tipo TypeScript
+  declare global {
+    interface Window {
+      portfolioSettings?: PortfolioSettings;
+    }
+  }
+
+  interface SettingsType {
+    theme: string;
+    language: string;
+    fontSize: number;
+    reduceMotion: boolean;
+    highContrast: boolean;
+    lazyLoading: boolean;
+    prefetch: boolean;
+  }
+
+  // Configuraciones globales
+  class PortfolioSettings {
+    settings: SettingsType;
+
+    constructor() {
+      this.settings = this.loadSettings();
+      this.init();
+    }
+
+    // Configuraciones por defecto
+    getDefaultSettings() {
+      return {
+        theme: 'auto',
+        language: 'es',
+        reduceMotion: false,
+        highContrast: false,
+        fontSize: 100,
+        lazyLoading: true,
+        prefetch: true
+      };
+    }
+
+    // Cargar configuraciones desde localStorage
+    loadSettings() {
+      try {
+        const saved = localStorage.getItem('portfolio-settings');
+        return saved ? { ...this.getDefaultSettings(), ...JSON.parse(saved) } : this.getDefaultSettings();
+      } catch (error) {
+        console.error('Error loading settings:', error);
+        return this.getDefaultSettings();
+      }
+    }
+
+    // Guardar configuraciones
+    saveSettings() {
+      try {
+        localStorage.setItem('portfolio-settings', JSON.stringify(this.settings));
+        this.showNotification('Configuraciones guardadas correctamente');
+      } catch (error) {
+        console.error('Error saving settings:', error);
+        this.showNotification('Error al guardar configuraciones', 'error');
+      }
+    }
+
+    // Inicializar el sistema de configuraciones
+    init() {
+      this.applyAllSettings();
+      this.bindEvents();
+      this.initializeUI();
+    }
+
+    // Aplicar todas las configuraciones
+    applyAllSettings() {
+      this.applyTheme();
+      this.applyLanguage();
+      this.applyAccessibilitySettings();
+      this.applyPerformanceSettings();
+    }
+
+    // Aplicar tema
+    applyTheme() {
+      const { theme } = this.settings;
+      const root = document.documentElement;
+      
+      if (theme === 'auto') {
+        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+        const applyAutoTheme = () => {
+          if (mediaQuery.matches) {
+            root.classList.add('dark');
+          } else {
+            root.classList.remove('dark');
+          }
+        };
+        
+        applyAutoTheme();
+        mediaQuery.addEventListener('change', applyAutoTheme);
+      } else if (theme === 'dark') {
+        root.classList.add('dark');
+      } else {
+        root.classList.remove('dark');
+      }
+    }
+
+    // Aplicar configuraciones de accesibilidad
+    applyAccessibilitySettings() {
+      const { reduceMotion, highContrast, fontSize } = this.settings;
+      const root = document.documentElement;
+      
+      // Reducir movimiento
+      if (reduceMotion) {
+        root.style.setProperty('--animation-duration', '0s');
+        root.style.setProperty('--transition-duration', '0s');
+      } else {
+        root.style.removeProperty('--animation-duration');
+        root.style.removeProperty('--transition-duration');
+      }
+      
+      // Alto contraste
+      if (highContrast) {
+        root.classList.add('high-contrast');
+      } else {
+        root.classList.remove('high-contrast');
+      }
+      
+      // Tamaño de fuente
+      root.style.fontSize = `${fontSize}%`;
+    }
+
+    // Aplicar configuraciones de rendimiento
+    applyPerformanceSettings() {
+      const { lazyLoading, prefetch } = this.settings;
+      
+      // Configurar lazy loading
+      const images = document.querySelectorAll('img[data-src]');
+      if (lazyLoading && 'IntersectionObserver' in window) {
+        this.setupLazyLoading(images);
+      } else {
+        images.forEach(img => {
+          const imgElement = img as HTMLImageElement;
+          if (imgElement.dataset.src) {
+            imgElement.src = imgElement.dataset.src;
+            imgElement.removeAttribute('data-src');
+          }
+        });
+      }
+      
+      // Configurar prefetch
+      if (prefetch) {
+        this.setupPrefetch();
+      }
+    }
+
+    // Configurar lazy loading
+    setupLazyLoading(images: NodeListOf<Element>): void {
+      const imageObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const img = entry.target as HTMLImageElement;
+            if (img.dataset.src) {
+              img.src = img.dataset.src;
+              img.removeAttribute('data-src');
+            }
+            imageObserver.unobserve(img);
+          }
+        });
+      }, { rootMargin: '50px' });
+      
+      images.forEach((img: Element) => imageObserver.observe(img));
+    }
+
+    // Configurar prefetch
+    setupPrefetch() {
+      const links = document.querySelectorAll('a[href^="#"], a[href^="/"]');
+      const linkObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const link = entry.target;
+            const href = link.getAttribute('href');
+            if (href && !document.querySelector(`link[href="${href}"]`)) {
+              const prefetchLink = document.createElement('link');
+              prefetchLink.rel = 'prefetch';
+              prefetchLink.href = href;
+              document.head.appendChild(prefetchLink);
+            }
+          }
+        });
+      }, { rootMargin: '100px' });
+      
+      links.forEach(link => linkObserver.observe(link));
+    }
+
+    // Aplicar idioma
+    applyLanguage() {
+      const { language } = this.settings;
+      document.documentElement.lang = language;
+      
+      // Aquí podrías implementar la lógica de traducción
+      // Por ejemplo, cargar archivos de traducción o cambiar textos
+    }
+
+    // Vincular eventos
+    bindEvents() {
+      // Toggle principal de configuraciones
+      const settingsToggle = document.getElementById('settings-toggle');
+      const settingsPanel = document.getElementById('settings-panel');
+      const settingsClose = document.getElementById('settings-close');
+      
+      settingsToggle?.addEventListener('click', () => this.togglePanel());
+      settingsClose?.addEventListener('click', () => this.closePanel());
+      
+      // Cerrar panel al hacer clic fuera
+      document.addEventListener('click', (e) => {
+        if (!(e.target as HTMLElement)?.closest('#theme-provider')) {
+          this.closePanel();
+        }
+      });
+      
+      // Selector de tema
+      document.querySelectorAll('.theme-option').forEach(button => {
+        (button as HTMLButtonElement).addEventListener('click', () => {
+          const theme = (button as HTMLButtonElement).dataset.theme;
+          this.updateSetting('theme', theme);
+        });
+      });
+      
+      // Selector de idioma
+      const languageSelect = document.getElementById('language-select');
+      languageSelect?.addEventListener('change', (e) => {
+        this.updateSetting('language', (e.target as HTMLSelectElement).value);
+      });
+      
+      // Toggles de accesibilidad
+      document.getElementById('reduce-motion-toggle')?.addEventListener('click', () => {
+        this.toggleSetting('reduceMotion');
+      });
+      
+      document.getElementById('high-contrast-toggle')?.addEventListener('click', () => {
+        this.toggleSetting('highContrast');
+      });
+      
+      // Slider de tamaño de fuente
+      const fontSizeSlider = document.getElementById('font-size-slider');
+      fontSizeSlider?.addEventListener('input', (e) => {
+        const target = e.target as HTMLInputElement;
+        this.updateSetting('fontSize', parseInt(target.value));
+        const display = document.getElementById('font-size-display');
+        if (display) display.textContent = `${target.value}%`;
+      });
+      
+      // Toggles de rendimiento
+      document.getElementById('lazy-loading-toggle')?.addEventListener('click', () => {
+        this.toggleSetting('lazyLoading');
+      });
+      
+      document.getElementById('prefetch-toggle')?.addEventListener('click', () => {
+        this.toggleSetting('prefetch');
+      });
+      
+      // Botones de acción
+      document.getElementById('reset-settings')?.addEventListener('click', () => {
+        this.resetSettings();
+      });
+      
+      document.getElementById('export-settings')?.addEventListener('click', () => {
+        this.exportSettings();
+      });
+      
+      // Cerrar notificación
+      document.getElementById('notification-close')?.addEventListener('click', () => {
+        this.hideNotification();
+      });
+    }
+
+    // Inicializar UI con configuraciones actuales
+    initializeUI() {
+      // Actualizar selector de tema
+      document.querySelectorAll('.theme-option').forEach(button => {
+        if ((button as HTMLElement).dataset.theme === this.settings.theme) {
+          button.classList.add('border-indigo-500', 'bg-indigo-50', 'dark:bg-indigo-900/30');
+        } else {
+          button.classList.remove('border-indigo-500', 'bg-indigo-50', 'dark:bg-indigo-900/30');
+          button.classList.add('border-gray-200', 'dark:border-gray-600');
+        }
+      });
+      
+      // Actualizar selector de idioma
+      const languageSelect = document.getElementById('language-select');
+      if (languageSelect) {
+        (languageSelect as HTMLSelectElement).value = this.settings.language;
+      }
+      
+      // Actualizar toggles
+      this.updateToggleUI('reduce-motion-toggle', this.settings.reduceMotion);
+      this.updateToggleUI('high-contrast-toggle', this.settings.highContrast);
+      this.updateToggleUI('lazy-loading-toggle', this.settings.lazyLoading);
+      this.updateToggleUI('prefetch-toggle', this.settings.prefetch);
+      
+      // Actualizar slider de fuente
+      const fontSizeSlider = document.getElementById('font-size-slider');
+      const fontSizeDisplay = document.getElementById('font-size-display');
+      if (fontSizeSlider && fontSizeDisplay) {
+        (fontSizeSlider as HTMLInputElement).value = this.settings.fontSize.toString();
+        fontSizeDisplay.textContent = `${this.settings.fontSize}%`;
+      }
+    }
+
+    // Actualizar UI de toggle
+    updateToggleUI(toggleId: string, isActive: boolean): void {
+      const toggle = document.getElementById(toggleId);
+      if (!toggle) return;
+      
+      const circle = toggle.querySelector('.toggle-circle');
+      if (!circle) return;
+      
+      if (isActive) {
+        toggle.classList.add('bg-indigo-600', 'dark:bg-indigo-500');
+        toggle.classList.remove('bg-gray-200', 'dark:bg-gray-600');
+        (circle as HTMLElement).classList.add('translate-x-5');
+        (circle as HTMLElement).classList.remove('translate-x-0.5');
+        toggle.setAttribute('aria-checked', 'true');
+      } else {
+        toggle.classList.remove('bg-indigo-600', 'dark:bg-indigo-500');
+        toggle.classList.add('bg-gray-200', 'dark:bg-gray-600');
+        (circle as HTMLElement).classList.remove('translate-x-5');
+        (circle as HTMLElement).classList.add('translate-x-0.5');
+        toggle.setAttribute('aria-checked', 'false');
+      }
+    }
+
+    // Actualizar configuración
+    updateSetting(key: keyof SettingsType, value: any): void {
+      (this.settings as any)[key] = value;
+      this.saveSettings();
+      this.applyAllSettings();
+      this.initializeUI();
+    }
+
+    // Toggle de configuración booleana
+    toggleSetting(key: keyof SettingsType): void {
+      (this.settings as any)[key] = !(this.settings as any)[key];
+      this.saveSettings();
+      this.applyAllSettings();
+      this.initializeUI();
+    }
+
+    // Toggle del panel
+    togglePanel() {
+      const panel = document.getElementById('settings-panel');
+      if (!panel) return;
+      
+      if (panel.classList.contains('scale-0')) {
+        this.openPanel();
+      } else {
+        this.closePanel();
+      }
+    }
+
+    // Abrir panel
+    openPanel() {
+      const panel = document.getElementById('settings-panel');
+      if (!panel) return;
+      panel.classList.remove('scale-0', 'opacity-0');
+      panel.classList.add('scale-100', 'opacity-100');
+    }
+
+    // Cerrar panel
+    closePanel() {
+      const panel = document.getElementById('settings-panel');
+      if (!panel) return;
+      panel.classList.add('scale-0', 'opacity-0');
+      panel.classList.remove('scale-100', 'opacity-100');
+    }
+
+    // Restablecer configuraciones
+    resetSettings() {
+      if (confirm('¿Estás seguro de que quieres restablecer todas las configuraciones?')) {
+        this.settings = this.getDefaultSettings();
+        this.saveSettings();
+        this.applyAllSettings();
+        this.initializeUI();
+        this.showNotification('Configuraciones restablecidas');
+      }
+    }
+
+    // Exportar configuraciones
+    exportSettings() {
+      const dataStr = JSON.stringify(this.settings, null, 2);
+      const dataBlob = new Blob([dataStr], { type: 'application/json' });
+      const url = URL.createObjectURL(dataBlob);
+      
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'portfolio-settings.json';
+      link.click();
+      
+      URL.revokeObjectURL(url);
+      this.showNotification('Configuraciones exportadas');
+    }
+
+    // Mostrar notificación
+    showNotification(message: string, type: string = 'success'): void {
+      const notification = document.getElementById('settings-notification');
+      const messageEl = document.getElementById('notification-message');
+      
+      if (notification && messageEl) {
+        messageEl.textContent = message;
+        
+        // Aplicar estilos según el tipo
+        if (type === 'error') {
+          notification.classList.add('border-red-200', 'dark:border-red-800');
+          notification.classList.remove('border-gray-200', 'dark:border-gray-700');
+        } else {
+          notification.classList.remove('border-red-200', 'dark:border-red-800');
+          notification.classList.add('border-gray-200', 'dark:border-gray-700');
+        }
+        
+        notification.classList.remove('translate-x-full', 'opacity-0');
+        notification.classList.add('translate-x-0', 'opacity-100');
+        
+        // Auto hide después de 3 segundos
+        setTimeout(() => {
+          this.hideNotification();
+        }, 3000);
+      }
+    }
+
+    // Ocultar notificación
+    hideNotification() {
+      const notification = document.getElementById('settings-notification');
+      if (notification) {
+        notification.classList.add('translate-x-full', 'opacity-0');
+        notification.classList.remove('translate-x-0', 'opacity-100');
+      }
+    }
+  }
+
+  // Inicializar cuando el DOM esté listo
+  document.addEventListener('DOMContentLoaded', () => {
+    (window as any).portfolioSettings = new PortfolioSettings();
+    console.log('⚙️ Portfolio settings initialized');
+  });
+
+  // Manejar cambios en las preferencias del sistema
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+    if ((window as any).portfolioSettings?.settings.theme === 'auto') {
+      (window as any).portfolioSettings.applyTheme();
+    }
+  });
+  
+  window.matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change', (e) => {
+    if (e.matches && !(window as any).portfolioSettings?.settings.reduceMotion) {
+      (window as any).portfolioSettings?.updateSetting('reduceMotion', true);
+    }
+  });
+</script>
+
+<style>
+  /* Estilos para el tema oscuro */
+  @media (prefers-color-scheme: dark) {
+    :root {
+      color-scheme: dark;
+    }
+  }
+
+  /* Estilos para alto contraste */
+  .high-contrast {
+    filter: contrast(150%) brightness(110%);
+  }
+
+  .high-contrast * {
+    text-shadow: 0 0 1px currentColor;
+  }
+
+  /* Estilos para los toggles */
+  .toggle-switch {
+    position: relative;
+  }
+
+  .toggle-circle {
+    position: absolute;
+    top: 0.125rem;
+    left: 0.125rem;
+    background-color: white;
+    border-radius: 50%;
+    transition: transform 0.2s;
+  }
+
+  /* Estilos para el slider */
+  .slider {
+    background: linear-gradient(to right, #e5e7eb 0%, #6366f1 50%, #e5e7eb 100%);
+  }
+
+  .slider::-webkit-slider-thumb {
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #6366f1;
+    cursor: pointer;
+    border: 2px solid white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  }
+
+  .slider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #6366f1;
+    cursor: pointer;
+    border: 2px solid white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  }
+
+  /* Animaciones */
+  @keyframes slideInRight {
+    from {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideOutRight {
+    from {
+      transform: translateX(0);
+      opacity: 1;
+    }
+    to {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+  }
+
+  /* Respuesta a preferencias de movimiento reducido */
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  /* Mejoras de accesibilidad */
+  .focus-visible:focus {
+    outline: 2px solid #6366f1;
+    outline-offset: 2px;
+  }
+
+  /* Estilos responsive */
+  @media (max-width: 640px) {
+    #settings-panel {
+      width: calc(100vw - 2rem);
+      right: 1rem;
+    }
+  }
+</style>
