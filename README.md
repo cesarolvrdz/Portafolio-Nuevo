@@ -47,8 +47,8 @@
 3. **Configurar variables de entorno** (Opcional - para datos dinámicos)
    ```bash
    # Crear archivo .env en la raíz del proyecto
-   PUBLIC_SUPABASE_URL=https://tu-proyecto.supabase.co
-   PUBLIC_SUPABASE_ANON_KEY=tu-clave-publica-aqui
+   URL=https://tu-proyecto.supabase.co
+   ANON_KEY=tu-clave-publica-aqui
    ```
 
 4. **Ejecutar en desarrollo**
@@ -104,8 +104,6 @@ Compatible con:
 **César Olvera Rodríguez**
 - GitHub: [@cesarolvrdz](https://github.com/cesarolvrdz)
 - LinkedIn: [César Olvera](https://linkedin.com/in/cesarolvrdz)
-- Portfolio: [En vivo](https://cesarolvrdz.github.io/Portafolio-Nuevo/)
-
 ---
 
 ⭐ **¡Si te gusta este proyecto, dale una estrella!** ⭐
