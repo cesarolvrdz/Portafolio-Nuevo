@@ -5,15 +5,25 @@
 @layer base {
   html {
     scroll-behavior: smooth;
-    scroll-padding-top: 80px;
+    scroll-padding-top: clamp(60px, 8vh, 100px);
+    /* Mejoras para zoom y accesibilidad */
+    font-size: clamp(14px, 1vw, 18px);
+    -webkit-text-size-adjust: 100%;
+    -moz-text-size-adjust: 100%;
+    text-size-adjust: 100%;
   }
 
   body {
-    @apply bg-gradient-to-br from-slate-50 via-white to-slate-50 text-slate-800;
+    background: var(--bg-gradient);
+    color: var(--text-primary);
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    /* Mejora compatibilidad con zoom */
+    font-size: clamp(14px, 1rem, 18px);
+    min-height: 100vh;
+    overflow-x: hidden;
   }
 
   * {
@@ -98,26 +108,28 @@
     @apply bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent;
   }
 
-  /* Custom scrollbar */
+  /* Custom scrollbar mejorado */
   .scrollbar-thin {
     scrollbar-width: thin;
-    scrollbar-color: rgb(99 102 241) rgb(248 250 252);
+    scrollbar-color: var(--accent-primary) var(--bg-secondary);
   }
 
   .scrollbar-thin::-webkit-scrollbar {
-    width: 8px;
+    width: 6px;
   }
 
   .scrollbar-thin::-webkit-scrollbar-track {
-    @apply bg-slate-100 rounded-full;
+    background: var(--bg-secondary);
+    border-radius: 10px;
   }
 
   .scrollbar-thin::-webkit-scrollbar-thumb {
-    @apply bg-gradient-to-b from-blue-500 to-purple-500 rounded-full;
+    background: linear-gradient(180deg, var(--accent-primary), var(--accent-secondary));
+    border-radius: 10px;
   }
 
   .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-    @apply from-blue-600 to-purple-600;
+    background: linear-gradient(180deg, var(--accent-secondary), var(--accent-primary));
   }
 }
 
@@ -189,25 +201,47 @@
   }
 }
 
-/* Modo oscuro */
+/* Sistema completo de variables de tema */
 :root {
-  --bg-primary: theme('colors.slate.50');
-  --bg-secondary: theme('colors.white');
-  --text-primary: theme('colors.slate.800');
-  --text-secondary: theme('colors.slate.600');
-  --border-primary: theme('colors.slate.200');
-  --nav-bg: rgba(255, 255, 255, 0.9);
-  --card-bg: rgba(255, 255, 255, 0.8);
+  --bg-primary: #f8fafc;
+  --bg-secondary: #ffffff;
+  --bg-gradient: linear-gradient(135deg, #f8fafc 0%, #ffffff 50%, #f1f5f9 100%);
+  --text-primary: #1e293b;
+  --text-secondary: #64748b;
+  --text-muted: #94a3b8;
+  --border-primary: #e2e8f0;
+  --border-secondary: #cbd5e1;
+  --nav-bg: rgba(255, 255, 255, 0.95);
+  --card-bg: rgba(255, 255, 255, 0.9);
+  --hero-gradient: linear-gradient(135deg, #1e1b4b 0%, #581c87 50%, #be185d 100%);
+  --accent-primary: #3b82f6;
+  --accent-secondary: #8b5cf6;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --error: #ef4444;
+  --shadow: rgba(0, 0, 0, 0.1);
+  --shadow-lg: rgba(0, 0, 0, 0.25);
 }
 
 .dark {
-  --bg-primary: theme('colors.slate.900');
-  --bg-secondary: theme('colors.slate.800');
-  --text-primary: theme('colors.slate.100');
-  --text-secondary: theme('colors.slate.300');
-  --border-primary: theme('colors.slate.700');
-  --nav-bg: rgba(15, 23, 42, 0.9);
-  --card-bg: rgba(30, 41, 59, 0.8);
+  --bg-primary: #0f172a;
+  --bg-secondary: #1e293b;
+  --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+  --text-primary: #f1f5f9;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
+  --border-primary: #475569;
+  --border-secondary: #64748b;
+  --nav-bg: rgba(15, 23, 42, 0.95);
+  --card-bg: rgba(30, 41, 59, 0.9);
+  --hero-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #581c87 100%);
+  --accent-primary: #60a5fa;
+  --accent-secondary: #a78bfa;
+  --success: #34d399;
+  --warning: #fbbf24;
+  --error: #f87171;
+  --shadow: rgba(0, 0, 0, 0.3);
+  --shadow-lg: rgba(0, 0, 0, 0.5);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -222,15 +256,40 @@
   }
 }
 
-/* Clases utilitarias para modo oscuro */
+/* Clases utilitarias expandidas para modo oscuro */
 @layer utilities {
   .bg-primary { background-color: var(--bg-primary); }
   .bg-secondary { background-color: var(--bg-secondary); }
+  .bg-gradient-theme { background: var(--bg-gradient); }
   .text-primary { color: var(--text-primary); }
   .text-secondary { color: var(--text-secondary); }
+  .text-muted { color: var(--text-muted); }
   .border-primary { border-color: var(--border-primary); }
+  .border-secondary { border-color: var(--border-secondary); }
   .nav-bg { background-color: var(--nav-bg); }
   .card-bg { background-color: var(--card-bg); }
+  .hero-gradient { background: var(--hero-gradient); }
+  .shadow-theme { box-shadow: 0 4px 6px var(--shadow); }
+  .shadow-theme-lg { box-shadow: 0 10px 15px var(--shadow-lg); }
+  
+  /* Mejoras para zoom y accesibilidad */
+  .text-responsive { font-size: clamp(0.875rem, 1vw, 1rem); }
+  .text-responsive-lg { font-size: clamp(1rem, 1.2vw, 1.125rem); }
+  .text-responsive-xl { font-size: clamp(1.125rem, 1.5vw, 1.25rem); }
+  .text-responsive-2xl { font-size: clamp(1.25rem, 2vw, 1.5rem); }
+  .text-responsive-3xl { font-size: clamp(1.5rem, 3vw, 2rem); }
+  
+  /* Espaciado responsivo */
+  .spacing-responsive { padding: clamp(1rem, 3vw, 2rem); }
+  .spacing-responsive-sm { padding: clamp(0.5rem, 2vw, 1rem); }
+  .spacing-responsive-lg { padding: clamp(2rem, 5vw, 4rem); }
+  
+  /* Contenedores adaptativos al zoom */
+  .container-zoom-friendly {
+    max-width: min(100vw - 2rem, 1200px);
+    margin: 0 auto;
+    padding: 0 clamp(1rem, 3vw, 2rem);
+  }
 }
 
 /* Sistema de animaciones de scroll */
@@ -380,4 +439,21 @@
     opacity: 1 !important;
     transform: none !important;
   }
+}
+
+/* Modo de rendimiento */
+.performance-mode * {
+  animation-duration: 0.1s !important;
+  transition-duration: 0.1s !important;
+}
+
+.performance-mode [data-animate] {
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+.performance-mode .animate-pulse-soft,
+.performance-mode .animate-bounce,
+.performance-mode .animate-float {
+  animation: none !important;
 }

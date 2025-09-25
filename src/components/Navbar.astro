@@ -21,7 +21,7 @@ const showContact = siteSettings?.show_contact !== false;
 const navbarTitle = siteSettings?.navbar_title || 'Desarrollador - Creador de Contenido';
 ---
 
-<nav class="fixed w-full bg-white/90 dark:bg-slate-900/90 backdrop-blur-md shadow-lg border-b border-slate-200/50 dark:border-slate-700/50 z-50 transition-all duration-300">
+<nav class="fixed top-0 w-full bg-white/90 dark:bg-slate-900/90 backdrop-blur-md shadow-lg border-b border-slate-200/50 dark:border-slate-700/50 z-50 transition-all duration-300">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex justify-between items-center py-4">
       <!-- Logo/Título Profesional -->
@@ -74,22 +74,7 @@ const navbarTitle = siteSettings?.navbar_title || 'Desarrollador - Creador de Co
       </div>
       
       <!-- Controles de la derecha -->
-      <div class="flex items-center space-x-2">
-        <!-- Botón de Modo Oscuro -->
-        <button 
-          id="theme-toggle" 
-          class="p-2 rounded-lg bg-slate-100/50 hover:bg-slate-200/80 dark:bg-slate-800/50 dark:hover:bg-slate-700/80 border border-slate-200/50 dark:border-slate-700/50 text-slate-600 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 transition-all duration-300 hover:scale-105 hover:shadow-md"
-          aria-label="Alternar modo oscuro"
-          title="Alternar modo oscuro"
-        >
-          <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
-          </svg>
-          <svg id="theme-toggle-light-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"></path>
-          </svg>
-        </button>
-        
+      <div class="flex items-center">
         <!-- Botón móvil -->
         <button 
           id="mobile-menu-button" 
@@ -105,9 +90,9 @@ const navbarTitle = siteSettings?.navbar_title || 'Desarrollador - Creador de Co
     </div>
   </div>
   
-  <!-- Menú móvil -->
-  <div id="mobile-menu" class="md:hidden hidden bg-white/95 dark:bg-slate-900/95 border-t border-slate-200/50 dark:border-slate-700/50 backdrop-blur-md">
-    <div class="px-4 pt-3 pb-4 space-y-1">
+  <!-- Menú móvil con scroll mejorado y altura fija -->
+  <div id="mobile-menu" class="md:hidden hidden bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-700 shadow-xl" style="max-height: 75vh; overflow-y: auto; scrollbar-width: thin; scrollbar-color: #3b82f6 #f1f5f9;">
+    <div class="px-4 py-4 space-y-2" style="min-height: 200px;">
       <a href="#hero" class="mobile-nav-link smooth-scroll">
         <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
@@ -138,6 +123,28 @@ const navbarTitle = siteSettings?.navbar_title || 'Desarrollador - Creador de Co
           Contacto
         </a>
       )}
+      
+      <!-- Separador y opciones básicas -->
+      <div class="border-t border-slate-200 dark:border-slate-700 my-3 pt-3">
+        <div class="text-xs text-slate-500 uppercase tracking-wide font-semibold mb-2 px-3">Configuración</div>
+        
+        <!-- Opción de accesibilidad -->
+        <button class="mobile-nav-link w-full text-left" onclick="toggleReducedMotion()">
+          <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+          </svg>
+          <span>Reducir animaciones</span>
+        </button>
+        
+        <!-- Opción de rendimiento -->
+        <button class="mobile-nav-link w-full text-left" onclick="togglePerformanceMode()">
+          <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+          </svg>
+          <span>Modo rendimiento</span>
+        </button>
+      </div>
     </div>
   </div>
 </nav>
@@ -169,7 +176,38 @@ const navbarTitle = siteSettings?.navbar_title || 'Desarrollador - Creador de Co
   }
 
   .mobile-nav-link {
-    @apply flex items-center px-3 py-3 text-base font-medium text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-slate-100 hover:bg-slate-100/50 dark:hover:bg-slate-800/50 rounded-lg transition-all duration-300 border border-transparent hover:border-slate-200/50 dark:hover:border-slate-700/50;
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #64748b;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.75rem;
+    transition: all 0.3s ease;
+    margin-bottom: 0.5rem;
+  }
+  
+  .mobile-nav-link:hover {
+    color: #1e293b;
+    background-color: #3b82f6;
+    color: white;
+    border-color: #3b82f6;
+    transform: translateX(8px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  }
+  
+  .dark .mobile-nav-link {
+    color: #cbd5e1;
+    background: #1e293b;
+    border-color: #475569;
+  }
+  
+  .dark .mobile-nav-link:hover {
+    background-color: #3b82f6;
+    color: white;
+    border-color: #3b82f6;
   }
 
   .mobile-nav-link:hover {
@@ -204,48 +242,10 @@ const navbarTitle = siteSettings?.navbar_title || 'Desarrollador - Creador de Co
 </style>
 
 <script>
-  // Funcionalidad del modo oscuro
+  // Funcionalidad del menú móvil
   document.addEventListener('DOMContentLoaded', function() {
-    const themeToggle = document.getElementById('theme-toggle');
-    const darkIcon = document.getElementById('theme-toggle-dark-icon');
-    const lightIcon = document.getElementById('theme-toggle-light-icon');
     const mobileMenuButton = document.getElementById('mobile-menu-button');
     const mobileMenu = document.getElementById('mobile-menu');
-
-    // Función para aplicar tema
-    function applyTheme(theme) {
-      if (theme === 'dark') {
-        document.documentElement.classList.add('dark');
-        darkIcon?.classList.add('hidden');
-        lightIcon?.classList.remove('hidden');
-      } else {
-        document.documentElement.classList.remove('dark');
-        darkIcon?.classList.remove('hidden');
-        lightIcon?.classList.add('hidden');
-      }
-    }
-
-    // Inicializar tema
-    const savedTheme = localStorage.getItem('theme');
-    const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-    const currentTheme = savedTheme || systemTheme;
-    
-    applyTheme(currentTheme);
-
-    // Toggle de tema
-    themeToggle?.addEventListener('click', function() {
-      const isDark = document.documentElement.classList.contains('dark');
-      const newTheme = isDark ? 'light' : 'dark';
-      
-      applyTheme(newTheme);
-      localStorage.setItem('theme', newTheme);
-      
-      // Animación del botón
-      this.style.transform = 'scale(0.95) rotate(180deg)';
-      setTimeout(() => {
-        this.style.transform = '';
-      }, 150);
-    });
 
     // Menú móvil
     mobileMenuButton?.addEventListener('click', function() {
@@ -324,33 +324,7 @@ const navbarTitle = siteSettings?.navbar_title || 'Desarrollador - Creador de Co
     
     window.addEventListener('scroll', highlightActiveSection);
     highlightActiveSection(); // Initial call
-  });
-</script>
 
-<script>
-  // Funcionalidad del menú móvil
-  document.addEventListener('DOMContentLoaded', function() {
-    const mobileMenuButton = document.getElementById('mobile-menu-button');
-    const mobileMenu = document.getElementById('mobile-menu');
-    
-    if (mobileMenuButton && mobileMenu) {
-      mobileMenuButton.addEventListener('click', function() {
-        const isExpanded = mobileMenuButton.getAttribute('aria-expanded') === 'true';
-        
-        mobileMenuButton.setAttribute('aria-expanded', (!isExpanded).toString());
-        mobileMenu.classList.toggle('hidden');
-      });
-      
-      // Cerrar menú al hacer clic en enlaces
-      const mobileLinks = mobileMenu.querySelectorAll('a');
-      mobileLinks.forEach(link => {
-        link.addEventListener('click', function() {
-          mobileMenu.classList.add('hidden');
-          mobileMenuButton.setAttribute('aria-expanded', 'false');
-        });
-      });
-    }
-    
     // Smooth scroll para todos los enlaces internos
     document.querySelectorAll('a[href^="#"]').forEach((anchor: Element) => {
       anchor.addEventListener('click', (e: Event) => {
@@ -367,36 +341,36 @@ const navbarTitle = siteSettings?.navbar_title || 'Desarrollador - Creador de Co
         }
       });
     });
-    
-    // Resaltar enlace activo según scroll
-    function updateActiveLink() {
-      const sections = document.querySelectorAll('section[id]');
-      const navLinks = document.querySelectorAll('.nav-link');
-      
-      let currentSection = '';
-      const scrollPosition = window.scrollY + 100;
-      
-      sections.forEach(section => {
-        const htmlElement = section as HTMLElement;
-        const sectionTop = htmlElement.offsetTop;
-        const sectionHeight = htmlElement.offsetHeight;
-        
-        if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
-          currentSection = htmlElement.getAttribute('id') || '';
-        }
-      });
-      
-      navLinks.forEach(link => {
-        link.classList.remove('active');
-        const href = link.getAttribute('href');
-        if (href === `#${currentSection}`) {
-          link.classList.add('active');
-        }
-      });
-    }
-    
-    // Actualizar enlace activo en scroll
-    window.addEventListener('scroll', updateActiveLink);
-    updateActiveLink(); // Ejecutar al cargar
   });
+
+  // Funciones de configuración
+  function toggleReducedMotion() {
+    const isReduced = document.documentElement.style.getPropertyValue('--animation-duration') === '0.01ms';
+    if (isReduced) {
+      document.documentElement.style.removeProperty('--animation-duration');
+      localStorage.removeItem('reduced-motion');
+    } else {
+      document.documentElement.style.setProperty('--animation-duration', '0.01ms');
+      localStorage.setItem('reduced-motion', 'true');
+    }
+  }
+
+  function togglePerformanceMode() {
+    const isPerformance = document.body.classList.contains('performance-mode');
+    if (isPerformance) {
+      document.body.classList.remove('performance-mode');
+      localStorage.removeItem('performance-mode');
+    } else {
+      document.body.classList.add('performance-mode');
+      localStorage.setItem('performance-mode', 'true');
+    }
+  }
+
+  // Cargar preferencias guardadas
+  if (localStorage.getItem('reduced-motion') === 'true') {
+    document.documentElement.style.setProperty('--animation-duration', '0.01ms');
+  }
+  if (localStorage.getItem('performance-mode') === 'true') {
+    document.body.classList.add('performance-mode');
+  }
 </script>

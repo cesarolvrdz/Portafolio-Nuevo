@@ -34,11 +34,11 @@ const showSocialLinks = sectionSettings?.show_social_links !== 'false';
 ---
 
 <Layout>
-	<main>
+	<main class="space-y-12 sm:space-y-16">
 		<!-- Navbar -->
 		<Navbar />
 		
-		<!-- Secciones principales -->
+		<!-- Secciones principales con mejor espaciado -->
 		{showHero && <Hero />}
 		{showAbout && <About />}
 		{showProjects && <Projects />}
