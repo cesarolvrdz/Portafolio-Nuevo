@@ -210,5 +210,90 @@ const siteName = seoSettings.site_title || 'César Olvera Portfolio';
 				}
 			})();
 		</script>
+
+		<!-- Sistema de animaciones de scroll -->
+		<script>
+			// Importar y inicializar las animaciones cuando el DOM esté listo
+			(async function initAnimations() {
+				if (typeof window === 'undefined') return;
+
+				// Configuración de animaciones
+				const animationConfig = {
+					threshold: 0.1,
+					rootMargin: '0px 0px -50px 0px'
+				};
+
+				let observer = null;
+				const animatedElements = new Set();
+
+				function animateElement(element) {
+					const animationType = element.getAttribute('data-animate') || 'fadeInUp';
+					const delay = element.getAttribute('data-animate-delay') || '0';
+					
+					// Agregar clase activa
+					element.classList.add('animate-active');
+					
+					// Aplicar delay si se especifica
+					if (delay !== '0') {
+						element.style.transitionDelay = delay + 'ms';
+					}
+
+					// Para animaciones stagger
+					if (animationType === 'stagger') {
+						const children = element.children;
+						Array.from(children).forEach((child, index) => {
+							setTimeout(() => {
+								child.classList.add('animate-active');
+							}, index * 100);
+						});
+					}
+				}
+
+				function observeElements() {
+					if (!observer) return;
+
+					// Observar elementos con data-animate
+					const elements = document.querySelectorAll('[data-animate]');
+					elements.forEach((element) => {
+						if (!animatedElements.has(element)) {
+							observer.observe(element);
+						}
+					});
+				}
+
+				function initScrollObserver() {
+					observer = new IntersectionObserver(
+						(entries) => {
+							entries.forEach((entry) => {
+								if (entry.isIntersecting && !animatedElements.has(entry.target)) {
+									animateElement(entry.target);
+									animatedElements.add(entry.target);
+								}
+							});
+						},
+						animationConfig
+					);
+
+					observeElements();
+				}
+
+				// Inicializar cuando el DOM esté listo
+				if (document.readyState === 'loading') {
+					document.addEventListener('DOMContentLoaded', initScrollObserver);
+				} else {
+					initScrollObserver();
+				}
+
+				// Reinicializar para contenido dinámico
+				window.refreshAnimations = function() {
+					if (observer) {
+						observeElements();
+					}
+				};
+
+				// Guardar referencia global
+				window.scrollAnimations = { observer, animatedElements };
+			})();
+		</script>
 	</body>
 </html>

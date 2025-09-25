@@ -78,50 +78,62 @@ const getStatusInfo = (status: string) => {
 };
 ---
 
-<!-- Projects Section con diseño mejorado -->
-<section id="projects" class="py-20 bg-gradient-to-br from-slate-50 via-white to-slate-100">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <!-- Section Header -->
-    <div class="text-center mb-16">
-      <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full mb-6">
-        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<!-- Projects Section Compacto y Dinámico -->
+<section id="projects" class="py-16 bg-gradient-to-br from-slate-50 via-white to-slate-100">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Section Header Compacto -->
+    <div class="text-center mb-12" data-animate="fadeInUp">
+      <div class="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full mb-4">
+        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
         </svg>
       </div>
-      <h2 class="text-4xl md:text-5xl font-bold text-slate-800 mb-6">
+      <h2 class="text-3xl md:text-4xl font-bold text-slate-800 mb-4">
         {sectionTitle}
       </h2>
-      <p class="text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed">
+      <p class="text-lg text-slate-600 max-w-2xl mx-auto leading-relaxed">
         {sectionDescription}
       </p>
       
-      <!-- Project Stats -->
-      <div class="flex flex-wrap justify-center gap-8 mt-12">
-        <div class="text-center">
-          <div class="text-3xl font-bold text-purple-600">{projects.length}</div>
-          <div class="text-slate-600">Proyectos</div>
+      <!-- Project Stats Dinámicas y Compactas -->
+      {projects.length > 0 && (
+        <div class="flex flex-wrap justify-center gap-6 mt-8" data-animate="stagger">
+          <div class="text-center">
+            <div class="text-2xl font-bold text-purple-600">{projects.length}</div>
+            <div class="text-sm text-slate-600">{projects.length === 1 ? 'Proyecto' : 'Proyectos'}</div>
+          </div>
+          {projects.filter(p => p.featured || p.is_featured).length > 0 && (
+            <div class="text-center">
+              <div class="text-2xl font-bold text-blue-600">{projects.filter(p => p.featured || p.is_featured).length}</div>
+              <div class="text-sm text-slate-600">Destacados</div>
+            </div>
+          )}
+          {projects.filter(p => (p.status?.toLowerCase() || '').includes('complet')).length > 0 && (
+            <div class="text-center">
+              <div class="text-2xl font-bold text-green-600">{projects.filter(p => (p.status?.toLowerCase() || '').includes('complet')).length}</div>
+              <div class="text-sm text-slate-600">Completados</div>
+            </div>
+          )}
         </div>
-        <div class="text-center">
-          <div class="text-3xl font-bold text-blue-600">{projects.filter(p => p.featured || p.is_featured).length}</div>
-          <div class="text-slate-600">Destacados</div>
-        </div>
-        <div class="text-center">
-          <div class="text-3xl font-bold text-green-600">{projects.filter(p => (p.status?.toLowerCase() || '').includes('complet')).length}</div>
-          <div class="text-slate-600">Completados</div>
-        </div>
-      </div>
+      )}
     </div>
 
-    <!-- Projects Grid -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
-      {sortedProjects.map((project) => {
+    <!-- Projects Grid Dinámico -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {sortedProjects.map((project, index) => {
         const statusInfo = getStatusInfo(project.status || '');
         const technologies = project.technologies || project.tech_tags || project.skills || project.tech || [];
         const demoUrl = project.demo_url || project.project_url || project.live_url || project.link;
         const githubUrl = project.github_url || project.repository_url;
         
         return (
-          <div class={`group relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden ${project.featured || project.is_featured ? 'ring-2 ring-purple-200 lg:col-span-2 xl:col-span-1' : ''}`}>
+          <div 
+            class={`group relative bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden animate-hover ${
+              project.featured || project.is_featured ? 'ring-2 ring-purple-200 md:col-span-2 lg:col-span-1' : ''
+            }`}
+            data-animate="fadeInUp"
+            data-animate-delay={index * 100}
+          >
             {/* Featured Badge */}
             {(project.featured || project.is_featured) && (
               <div class="absolute top-4 left-4 z-10">
